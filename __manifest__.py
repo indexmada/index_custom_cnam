@@ -7,10 +7,10 @@
         subtitle on modules listing or apps.openerp.com""",
 
     'description': """
-        Long description of module's purpose
+        EXTERNAL CNAM APP CUSTOM
     """,
 
-    'author': "My Company",
+    'author': "INDEX CONSULTING",
     'website': "http://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
