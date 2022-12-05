@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="regrouping_edu_form" model="ir.ui.view">
+		<field name="name">regrouping.center.form</field>
+        <field name="model">regrouping.center</field>
+        <field name="inherit_id" ref="edu_management.regrouping_edu_form"/>
+        <field name="arch" type="xml">
+        	<xpath expr="//field[@name='begin_hours']" position="replace">
+        		<field name="begin_hours" widget="float_time"/>
+        	</xpath>
+        	<xpath expr="//field[@name='end_hours']" position="replace">
+        		<field name="end_hours" widget="float_time"/>
+        	</xpath>
+        	<xpath expr="//field[@name='duration']" position="replace">
+        		<field name="duration" widget="float_time"/>
+        	</xpath>
+        </field>
+	</record>
+</odoo>
