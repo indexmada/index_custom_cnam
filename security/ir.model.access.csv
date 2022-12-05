@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_index_custom_cnam_index_custom_cnam,index_custom_cnam.index_custom_cnam,model_index_custom_cnam_index_custom_cnam,base.group_user,1,1,1,1
