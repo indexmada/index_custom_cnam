@@ -11,11 +11,30 @@ class index_custom_cnam(models.Model):
     begin_hours = fields.Float("Heure de début", required=True)
     end_hours = fields.Float("Heure de Fin", required=True)
 
+    begin_date_time = fields.Datetime("Date et Heure de début", store=False, compute='_compute_begin_date_time')
+    end_date_time = fields.Datetime("Date et Heure de fin", store=False, compute='_compute_end_date_time')
+
+    def _compute_begin_date_time(self):
+        for line in self:
+            begin_time = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(line.begin_hours) * 60, 60))
+            begin_time = datetime.strptime(begin_time.replace(':', ''),'%H%M').time()
+            line.begin_date_time =  datetime.combine(line.regrouping_id.date, begin_time)
+
+    def _compute_end_date_time(self):
+        for line in self:
+            end_time = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(line.end_hours) * 60, 60))
+            end_time = datetime.strptime(end_time.replace(':', ''),'%H%M').time()
+            line.end_date_time = datetime.combine(line.regrouping_id.date, end_time)
+
     @api.depends("begin_hours", "end_hours")
     def compute_duration(self):
         """Compute duration regrouping"""
         for line in self:
-            line.duration = line.end_hours - line.begin_hours
+            duration = line.end_hours - line.begin_hours
+            if duration < 0:
+                line.duration = 0
+            else:
+                line.duration = duration
 
 class RegroupingCentre(models.Model):
     _inherit = "regrouping.center"
@@ -46,8 +65,8 @@ class ExamRoom(models.Model):
         """Get state Room"""
         now = fields.Datetime.now()
         for room in self:
-            # regrouping = room.regrouping_lines_ids.filtered(lambda grouping: self.convert_Float_to_time(grouping.begin_hours) <= now.strftime("%H:%M") <= self.convert_Float_to_time(grouping.end_hours))
-            if False:
+            regrouping = room.regrouping_lines_ids.filtered(lambda grouping: grouping.begin_date_time <= now <= grouping.end_date_time)
+            if regrouping:
                 room.state = 'occuped' if regrouping.numbers_student > 0 else 'partially'
             else:
                 room.state = 'free'
