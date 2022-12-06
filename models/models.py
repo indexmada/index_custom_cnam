@@ -8,11 +8,28 @@ from datetime import datetime
 class index_custom_cnam(models.Model):
     _inherit = "regrouping.center.line"
 
+    name = fields.Char("Nom", compute="compute_line_name")
+
     begin_hours = fields.Float("Heure de début", required=True)
     end_hours = fields.Float("Heure de Fin", required=True)
 
-    begin_date_time = fields.Datetime("Date et Heure de début", store=False, compute='_compute_begin_date_time')
-    end_date_time = fields.Datetime("Date et Heure de fin", store=False, compute='_compute_end_date_time')
+    begin_date_time = fields.Datetime("Date et Heure de début", store=True, compute='_compute_begin_date_time')
+    end_date_time = fields.Datetime("Date et Heure de fin", store=True, compute='_compute_end_date_time')
+    
+    school_year_id = fields.Many2one('school.year', string="Année Universitaire", compute="_get_school_year")
+
+    regrouping_date = fields.Date("Regrouping Date", required=True, compute="_compute_regrouping_date")
+    def _compute_regrouping_date(self):
+        for line in self:
+            line.regrouping_date = line.regrouping_id.date
+
+    def convert_Float_to_time(self, time_float):
+        result = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(time_float) * 60, 60))
+        return result
+
+    def _get_school_year(self):
+        for line in self:
+            line.school_year_id = line.regrouping_id.school_year_id
 
     def _compute_begin_date_time(self):
         for line in self:
@@ -36,6 +53,10 @@ class index_custom_cnam(models.Model):
             else:
                 line.duration = duration
 
+    def compute_line_name(self):
+        for line in self:
+            line.name = str(line.code_ue)+' '+str(line.school_year_id.name)
+
 class RegroupingCentre(models.Model):
     _inherit = "regrouping.center"
 
@@ -57,9 +78,6 @@ class RegroupingCentre(models.Model):
 class ExamRoom(models.Model):
     _inherit = "examen.room"
 
-    def convert_Float_to_time(time_float):
-        result = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(time_float) * 60, 60))
-        return result
 
     def compute_state(self):
         """Get state Room"""

@@ -18,17 +18,113 @@
 	</record>
 
 
+    <record id="regrouping_line_edu_kanban" model="ir.ui.view">
+        <field name="name">regrouping.center.line.kanban</field>
+        <field name="model">regrouping.center.line</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="school_year_id"/>
+                <field name="regrouping_date">
+                    <field name="date"/>
+                </field>
+                <field name="day_of_week"/>
+                <field name="begin_hours"/>
+                <field name="end_hours"/>
+                <field name="duration"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="row mb4">
+                                    <strong class="col-6 text-right"> Année Scolaire : </strong>
+                                    <span class="col-6 text-left"> <field name="school_year_id"/></span>
+                            </div>
+                            <div class="row mb8">
+                                <strong class="col-6 text-right"> Date :</strong>
+                                <span class="col-6 text-left"><field name="regrouping_date"/></span>
+                            </div>
+                            <table class="table table-stripped">
+                                <thead>
+                                    <tr>
+                                        <th>Jour</th>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Total Heures</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span>
+                                                <field name="day_of_week"/>
+                                            </span></td>
+                                        <td>
+                                            <span>
+                                                <field name="regrouping_date"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span>
+                                                <field name="begin_hours" widget="float_time"/>
+                                            </span> à
+                                            <span>
+                                                <field name="end_hours" widget="float_time"/>
+                                            </span>
+                                        </td>
+                                        <td><span><field name="duration" widget="float_time"/></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+
+
+
+    <record model="ir.ui.view" id="grouping__line_view_calendar">
+            <field name="model">regrouping.center.line</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <calendar string="Regroupement" date_start="begin_date_time" date_stop="end_date_time" mode="month" quick_add="False"  event_open_popup="True" color="school_year_id">
+                    <field name="school_year_id"/>
+                </calendar>
+            </field>
+        </record>
+
+    <record id="p_grouping_edu_action" model="ir.actions.act_window">
+        <field name="name">Nouveau Calendrier Regroupement</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">regrouping.center.line</field>
+        <field name="view_mode">calendar,form,kanban</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+           Créer une nouvelle calendrier de regroupement
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="p_grouping_center_menu_edu"
+              name="Nouveau Calendrier Regroupement"
+              action="p_grouping_edu_action"
+              parent="edu_management.menu_grouping" sequence="2" />
+
 
 <!--      <record model="ir.ui.view" id="grouping_view_calendar">
-        <field name="model">regrouping.center</field>
-        <field name="priority" eval="2"/>
-        <field name="inherit_id" ref="edu_management.grouping_view_calendar"/>
-        <field name="arch" type="xml">
-            <calendar string="Regroupement" date_start="date" date_stop="date" mode="month" quick_add="False"  event_open_popup="True" color="school_year_id">
-                <field name="date"/>
-                <field name="school_year_id"/>
-            </calendar>
-        </field>
-    </record> -->
-
+            <field name="model">regrouping.center</field>
+            <field name="priority" eval="2"/>
+            <field name="inherit_id" ref="edu_management.grouping_view_calendar"/>
+            <field name="arch" type="xml">
+                <xpath expr="//calendar" position="replace">
+                    <field name="regrouping_line_ids">
+                        <calendar string="Regroupement" date_start="begin_date_time" date_stop="end_date_time" mode="month" quick_add="False"  event_open_popup="True" color="school_year_id">
+                            <field name="school_year_id"/>
+                        </calendar>
+                    </field>
+                </xpath>
+            </field>
+        </record> -->
 </odoo>
