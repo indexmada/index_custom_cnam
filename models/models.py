@@ -13,29 +13,16 @@ class index_custom_cnam(models.Model):
     begin_hours = fields.Float("Heure de début", required=True)
     end_hours = fields.Float("Heure de Fin", required=True)
 
-    begin_date_time = fields.Datetime("Date et Heure de début", store=True, compute='_compute_begin_date_time')
-    end_date_time = fields.Datetime("Date et Heure de fin", store=True, compute='_compute_end_date_time')
-    
-    school_year_id = fields.Many2one('school.year', string="Année Universitaire", compute="_get_school_year")
-
-    regrouping_date = fields.Date("Regrouping Date", required=True, compute="_compute_regrouping_date")
-    def _compute_regrouping_date(self):
-        for line in self:
-            line.regrouping_date = line.regrouping_id.date
-
-    def convert_Float_to_time(self, time_float):
-        result = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(time_float) * 60, 60))
-        return result
-
-    def _get_school_year(self):
-        for line in self:
-            line.school_year_id = line.regrouping_id.school_year_id
+    begin_date_time = fields.Datetime("Date et Heure de début", compute='_compute_begin_date_time')
+    end_date_time = fields.Datetime("Date et Heure de fin", compute='_compute_end_date_time')
 
     def _compute_begin_date_time(self):
         for line in self:
             begin_time = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(line.begin_hours) * 60, 60))
             begin_time = datetime.strptime(begin_time.replace(':', ''),'%H%M').time()
             line.begin_date_time =  datetime.combine(line.regrouping_id.date, begin_time)
+            print('*'*50)
+            print(line.begin_date_time)
 
     def _compute_end_date_time(self):
         for line in self:
@@ -59,6 +46,32 @@ class index_custom_cnam(models.Model):
 
 class RegroupingCentre(models.Model):
     _inherit = "regrouping.center"
+
+    reg_date_begin = fields.Datetime("Heure de début du regroupement", compute="compute_reg_date_begin")
+    reg_date_end = fields.Datetime("Heure du fin du regroupement", compute="compute_reg_date_end")
+
+    @api.depends("reg_date_begin")
+    def compute_reg_date_begin(self):
+        for reg in self:
+            min = 100
+            for line in reg.regrouping_line_ids:
+                if min > line.begin_hours:
+                    min = line.begin_hours
+            min = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(min) * 60, 60))
+            min_time = datetime.strptime(min.replace(':', ''),'%H%M').time()
+            reg.reg_date_begin = datetime.combine(reg.date, min_time)
+
+    @api.depends("reg_date_end")
+    def compute_reg_date_end(self):
+        for reg in self:
+            max = 0
+            for line in reg.regrouping_line_ids:
+                if max < line.end_hours:
+                    max = line.end_hours
+            max = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(max) * 60, 60))
+            max_time = datetime.strptime(max.replace(':', ''),'%H%M').time()
+            reg.reg_date_end = datetime.combine(reg.date, max_time)
+
 
     def get_all_line(self):
         for regroup in self:
