@@ -28,6 +28,7 @@
         'views/views.xml',
         'views/templates.xml',
         'views/regrouping_views.xml',
+        'views/exam_calandar_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
