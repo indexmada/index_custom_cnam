@@ -15,6 +15,11 @@ class index_custom_cnam(models.Model):
 
     begin_date_time = fields.Datetime("Date et Heure de début", compute='_compute_begin_date_time')
     end_date_time = fields.Datetime("Date et Heure de fin", compute='_compute_end_date_time')
+    school_year_id = fields.Many2one("school.year", "Année Universitaire", required=True,compute='compute_school_year')
+
+    def compute_school_year(self):
+        for line in self:
+            line.school_year_id = line.regrouping_id.school_year_id
 
     def _compute_begin_date_time(self):
         for line in self:
