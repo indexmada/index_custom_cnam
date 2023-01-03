@@ -103,7 +103,7 @@ class ExamRoom(models.Model):
         for room in self:
             regrouping = room.regrouping_lines_ids.filtered(lambda grouping: grouping.begin_date_time <= now <= grouping.end_date_time)
             if regrouping:
-                room.state = 'occuped' if regrouping.numbers_student > 0 else 'partially'
+                room.state = 'busy' if regrouping.numbers_student > 0 else 'partially'
             else:
                 room.state = 'free'
 
