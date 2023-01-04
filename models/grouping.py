@@ -18,6 +18,7 @@ class RegroupingCenter(models.Model):
 
     def action_distribution_student(self):
         """Action to distribution """
+        self.write({'button_state': 'send'})
         list_assignment = []
         ue_obj = self.env['unit.enseigne']
         assignment_obj = self.env['assignment.student']
@@ -107,7 +108,11 @@ class RegroupingCenter(models.Model):
 
 
     def action_envoyer_mail_regroupement(self):
-        template = self.env.ref("index_custom_cnam.regroupement_email")
+        if self.button_state == 'resend':
+            template = self.env.ref("index_custom_cnam.regroupement_re_send_email")
+        else:
+            self.write({'button_state': 'resend'})
+            template = self.env.ref("index_custom_cnam.regroupement_email")
         for line in self.regrouping_line_ids:
             if line.examen_rooms and line.assignement_ids:
                 for assignement in line.assignement_ids:
