@@ -29,6 +29,7 @@
         'views/templates.xml',
         'views/regrouping_views.xml',
         'views/exam_calandar_view.xml',
+        'views/email_template.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

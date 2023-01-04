@@ -106,4 +106,31 @@ class RegroupingCenter(models.Model):
         return not((nb1 < ch3 and nb2 < ch3) or (nb1 > ch4 and nb2 > ch4))
 
 
+    def action_envoyer_mail_regroupement(self):
+        template = self.env.ref("index_custom_cnam.regroupement_email")
+        for line in self.regrouping_line_ids:
+            if line.examen_rooms and line.assignement_ids:
+                for assignement in line.assignement_ids:
+                    if assignement.student_id.email:
+                        template_values = {
+                            'email_from': 'pounasatu@gmail.com',
+                            'email_to': assignement.student_id.email,
+                            'email_cc': False,
+                            'auto_delete': True,
+                            'partner_to': assignement.student_id.id,
+                            'scheduled_date': False,
+                        }
+
+                        template.write(template_values)
+                        context = {
+                            'lang': self.env.user.lang,
+                            'student_id': assignement.student_id,
+                            'room': assignement.room_id,
+                            'begin_hours': '{0:02.0f}:{1:02.0f}'.format(*divmod(float(line.begin_hours) * 60, 60)),
+                            'end_hours': '{0:02.0f}:{1:02.0f}'.format(*divmod(float(line.end_hours) * 60, 60))
+                        }
+                        with self.env.cr.savepoint():
+                            template.with_context(context).send_mail(line.id, force_send=True, raise_exception=True)
+                            values = template.generate_email(line.id)
+        return True
 
