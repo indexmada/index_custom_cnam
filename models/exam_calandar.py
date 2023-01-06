@@ -88,7 +88,7 @@ class index_custom_cnam(models.Model):
             student_list = []
             student_list = self.get_existant_student(exam)
             for unit_enseignes in unit_enseignes_obj:
-                if exam.education_unit.id == unit_enseignes.name.id and exam.centre_ue_id.id==unit_enseignes.center_id.id:
+                if unit_enseignes.name in exam.ue_ids and exam.centre_ue_id.id==unit_enseignes.center_id.id:
                     student=''
                     if unit_enseignes.inscription_id.name_marital:
                         student = unit_enseignes.inscription_id.name_marital
@@ -111,7 +111,7 @@ class index_custom_cnam(models.Model):
                             'address_name': unit_enseignes.inscription_id.adress,
                             'school_year': self.school_year.id,
                             'exam_id': exam.id,
-                            'line_ids': [(0,0, {'code':exam.education_unit.code,'display_name':exam.education_unit.display_name,
+                            'line_ids': [(0,0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
                                     'date':exam.date,'start_time':exam.start_time,
                                     'end_time':exam.end_time,'room':room_available,'table':place_available})]
                             }
