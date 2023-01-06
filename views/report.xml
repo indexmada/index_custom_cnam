@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="report_grouping">
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                            <div class="page">
+                                <h2 class="text-center"> 
+                                    Regroupement:
+                                    <span t-esc="o.ue_config_id.name"/>
+                                </h2>
+                                <p class="row">
+                                    Unité d'enseignement : <span t-esc="o.ue_config_id.name"/> (<span t-field="o.code_ue"/>)
+                                </p>
+                                <p class="row">
+                                    Année scolaire : <span t-esc="o.regrouping_id.school_year_id.name"/>
+                                </p>
+                                <p class="row">
+                                    Date : <span t-field="o.grouping_date"/>
+                                </p>
+                                <p class="row">
+                                    Heure: <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.begin_hours) * 60, 60))"/>
+                                    à
+                                    <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.end_hours) * 60, 60))"/>
+                                </p>
+
+                                <h4 class="text-center"> 
+                                    Etudiants:
+                                </h4>
+                                <table class="table table-sm table-bordered" name="invoice_line_table">
+                                    <thead>
+                                        <tr class="font-weight-bold">
+                                            <th class="text-center font-weight-bold">Numéro</th>
+                                            <th class="text-center font-weight-bold">Nom et prénom</th>
+                                            <th class="text-center font-weight-bold">Salle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="number_stud" t-value="1"/>
+                                        <tr t-foreach="o.assignement_ids" t-as="assignement">
+                                            <td class="text-center"> <span t-esc="number_stud" /></td>
+                                            <td> <span t-field="assignement.student_id"/></td>
+                                            <td><span t-esc="assignement.room_id.name"/></td>
+                                            <t t-set="number_stud" t-value="number_stud+1"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row mt4" style="page-break-after: always; margin-top: 20px;">
+                                    Le tuteur,
+                                </div>
+
+                            </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+
+    <report
+            id="regrouping_by_ue_report"
+            model="regrouping.center.line"
+            string="Regroupement"
+            report_type="qweb-pdf"
+            name="index_custom_cnam.report_grouping"
+            file="index_custom_cnam.report_grouping"
+        />
+
+    </data>
+</odoo>

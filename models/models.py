@@ -16,6 +16,11 @@ class index_custom_cnam(models.Model):
     begin_date_time = fields.Datetime("Date et Heure de début", compute='_compute_begin_date_time')
     end_date_time = fields.Datetime("Date et Heure de fin", compute='_compute_end_date_time')
     school_year_id = fields.Many2one("school.year", "Année Universitaire", required=True,compute='compute_school_year')
+    grouping_date = fields.Date("Date du regroupement", store=False, compute="_get_grouping_date")
+
+    def _get_grouping_date(self):
+        for record in self:
+            record.grouping_date = record.regrouping_id.date
 
     def compute_school_year(self):
         for line in self:
