@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'edu_management'],
+    'depends': ['base', 'edu_management', 'account'],
 
     # always loaded
     'data': [
@@ -30,7 +30,8 @@
         'views/regrouping_views.xml',
         'views/exam_calandar_view.xml',
         'views/email_template.xml',
-        'views/report.xml'
+        'views/report.xml',
+        'views/invoice_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

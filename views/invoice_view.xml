@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <odoo>
+
+    <record id="invoice_edu" model="ir.ui.view">
+      <field name="name">account.move.edu_form</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[last()]" position="after">
+          <page id="echelon" string="Relance échelonnement" name="relance_echeclon" attrs="{'readonly': False}">
+            <field name="payment_inscription_ids" widget="many2many">
+              <tree editable="bottom">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="amount"/>
+                <field name="currency_id"/>
+              </tree>
+            </field>
+            <group class="oe_subtotal_footer oe_right">
+                <field name="remain_to_pay_ariary" />
+                <field name="remain_to_pay_euro" />
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+  </odoo>
