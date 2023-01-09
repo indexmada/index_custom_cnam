@@ -13,7 +13,6 @@ class AccountMove(models.Model):
 
     @api.depends('payment_inscription_ids')
     def set_invoice_date(self):
-        print('_'*100)
         for record in self:
             max_date = ''
             for payment in record.payment_inscription_ids:
@@ -38,4 +37,39 @@ class AccountMove(models.Model):
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    payment_inscription_ids = fields.One2many('payment.inscription', "inscription_id",)
+    @api.model
+    def get_ctx(self):
+        payment_inscription_obj = self.env['payment.inscription'].sudo()
+        pi_ids = []
+        for invoice in self.invoice_ids:
+            if invoice.payment_inscription_ids:
+                for pi in invoice.payment_inscription_ids:
+                    pi_ids.append(int(pi.id))
+        return [('id','in', pi_ids)]
+
+    payment_inscription_ids = fields.Many2many('payment.inscription', string="Payment Inscription")
+    
+
+    @api.onchange('payment_inscription_ids')
+    def pi_change(self):
+        for record in self:
+            amount = 0
+            for pi in record.payment_inscription_ids:
+                amount += pi.cost_devise
+
+            record.amount = amount
+
+
+
+class PaymentInscription(models.Model):
+    _inherit = 'payment.inscription'
+
+    payment_state = fields.Boolean("Payé",compute="get_payment_statut")
+
+    def get_payment_statut(self):
+        for record in self:
+            pi_ids = self.env['account.payment'].sudo().search([('state', '!=', 'draft')]).mapped('payment_inscription_ids')
+            if record in pi_ids:
+                record.payment_state = True
+            else:
+                record.payment_state = False
