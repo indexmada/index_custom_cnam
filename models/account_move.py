@@ -6,22 +6,25 @@ from odoo import api, fields, models, _
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    payment_inscription_ids = fields.One2many('payment.inscription', "inscription_id", compute="get_payment_inscription_ids", store=False)
-    remain_to_pay_ariary = fields.Float("Reste à payer en Ariary", related='inscription_id.remain_to_pay_ariary')
-    remain_to_pay_euro = fields.Float("Reste à payer en Euro", related="inscription_id.remain_to_pay_euro")
-    invoice_date = fields.Date(readonly=True, string="Invoice Date", compute="set_invoice_date", store=True)
-
-    @api.depends('payment_inscription_ids')
-    def set_invoice_date(self):
+    @api.model
+    @api.depends('payment_inscription_ids.date')
+    def set_invoice_payment_term_date(self):
         for record in self:
+            print('*'*100)
             max_date = ''
             for payment in record.payment_inscription_ids:
                 if not max_date:
                     max_date = payment.date
                 if payment.date > max_date:
                     max_date = payment.date
+            if max_date:
+                record.invoice_date_due = max_date
 
-            record.invoice_date = max_date
+    payment_inscription_ids = fields.One2many('payment.inscription', "inscription_id", compute="get_payment_inscription_ids", store=False)
+    remain_to_pay_ariary = fields.Float("Reste à payer en Ariary", related='inscription_id.remain_to_pay_ariary')
+    remain_to_pay_euro = fields.Float("Reste à payer en Euro", related="inscription_id.remain_to_pay_euro")
+    invoice_date_due = fields.Date(string='Due Date', readonly=True, index=True, copy=False,
+        states={'draft': [('readonly', False)]}, store=True, default=set_invoice_payment_term_date, compute="set_invoice_payment_term_date")
 
     def get_payment_inscription_ids(self):
         for record in self:
