@@ -48,6 +48,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <br/>
                                 <div class="row mt4" style="page-break-after: always; margin-top: 20px;">
                                     Le tuteur,
                                 </div>
@@ -68,5 +69,70 @@
             file="index_custom_cnam.report_grouping"
         />
 
+
+        <template id="repartition_table_exam">
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                            <div class="page">
+                                <div>
+                                    Unités d'enseignement: 
+                                    <t t-foreach="o.ue_ids" t-as="ue">
+                                        <span t-esc="ue.display_name"/>, 
+                                    </t>
+                                </div>
+                                <div>
+                                    Date: <span t-esc="o.date" />
+                                </div>
+                                <div>
+                                    Horaire: <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.start_time) * 60, 60))" /> à <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.end_time) * 60, 60))" />
+                                </div>
+                                <div>
+                                    Centre: <span t-esc="o.centre_ue_id.name" />
+                                </div>
+
+                                <br/><br/><br/>
+                                <h4>REPARTITION:</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Numéro Auditeur</th>
+                                            <th>Etudiant</th>
+                                            <th>Salle</th>
+                                            <th>Table</th>
+                                            <th>Centre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.exam_repartition_ids" t-as="repartition">
+                                            <tr>
+                                                <td><span t-esc="repartition.auditor_number"/></td>
+                                                <td><span t-esc="repartition.student"/></td>
+                                                <td><span t-esc="repartition.room"/></td>
+                                                <td><span t-esc="repartition.table"/></td>
+                                                <td><span t-esc="repartition.centre_ue_id.name"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <br/>
+                                <div class="row mt4 text-center" style="page-break-after: always; margin-top: 20px;">
+                                    Le tuteur,
+                                </div>
+                            </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+    <report
+            id="exam_repartion_report"
+            model="exam.exam"
+            string="Répartition Salle"
+            report_type="qweb-pdf"
+            name="index_custom_cnam.repartition_table_exam"
+            file="index_custom_cnam.repartition_table_exam"
+        />
     </data>
 </odoo>
