@@ -31,7 +31,8 @@
         'views/exam_calandar_view.xml',
         'views/email_template.xml',
         'views/report.xml',
-        'views/invoice_view.xml'
+        'views/invoice_view.xml',
+        'views/cron.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

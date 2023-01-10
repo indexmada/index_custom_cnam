@@ -76,3 +76,24 @@ class PaymentInscription(models.Model):
                 record.payment_state = True
             else:
                 record.payment_state = False
+
+    def send_mail_rappel(self):
+
+        template = self.env.ref("index_custom_cnam.rappel_echelonnement")
+        template_values = {
+            'email_from': 'pounasatu@gmail.com',
+            'email_to': self.inscription_id.email,
+            'email_cc': False,
+            'auto_delete': True,
+            'partner_to': self.inscription_id.student_id.id,
+            'scheduled_date': False,
+        }
+
+        template.write(template_values)
+        context = {
+            'lang': self.env.user.lang,
+        }
+        with self.env.cr.savepoint():
+            template.with_context(context).send_mail(self.id, force_send=True, raise_exception=True)
+            values = template.generate_email(self.id)
+        return True
