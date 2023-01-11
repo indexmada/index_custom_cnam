@@ -42,7 +42,7 @@
                     </footer>
                 </xpath>
                 <xpath expr="//field[@name='journal_id']" position="after">
-                  <field name="payment_inscription_ids" widget="many2many_tags"/>
+                  <field name="payment_inscription_ids" widget="many2many_tags" string="Echelonnement"/>
                 </xpath>
             </field>
         </record>
