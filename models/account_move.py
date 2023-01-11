@@ -44,12 +44,15 @@ class AccountPayment(models.Model):
     def get_ctx(self):
         payment_inscription_obj = self.env['payment.inscription'].sudo()
         invoice_id = int(self.env.context.get('active_id') or 0)
-        invoices = self.env['account.move'].sudo().browse(invoice_id)
+        invoice_ids = self.env['account.move'].sudo().search([('id', '=',invoice_id)])
         pi_ids = []
-        for invoice in invoices:
-            if invoice.payment_inscription_ids:
-                for pi in invoice.payment_inscription_ids:
-                    pi_ids.append(int(pi.id))
+        for invoice in invoice_ids:
+            invoice_currency = invoice.currency_id
+            if invoice.inscription_id.payment_inscription_ids and invoice_currency:
+                payment_inscription_ids = invoice.inscription_id.payment_inscription_ids
+                for pi in payment_inscription_ids:
+                    if pi.currency_id == invoice_currency:
+                        pi_ids.append(int(pi.id))
         return [('id','in', pi_ids)]
 
     payment_inscription_ids = fields.Many2many('payment.inscription', string="Payment Inscription", domain=get_ctx)
