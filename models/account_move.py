@@ -53,7 +53,10 @@ class AccountPayment(models.Model):
                 for pi in payment_inscription_ids:
                     if pi.currency_id == invoice_currency:
                         pi_ids.append(int(pi.id))
-        return [('id','in', pi_ids)]
+        if pi_ids:
+            return [('id','in', pi_ids)]
+        else:
+            return []
 
     payment_inscription_ids = fields.Many2many('payment.inscription', string="Payment Inscription", domain=get_ctx)
     

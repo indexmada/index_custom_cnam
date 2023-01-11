@@ -28,3 +28,5 @@ class IndexCustomCnam(http.Controller):
                     'invoice_payment_term_id': None,
                     'invoice_date_due': max_date
                 })
+
+        return "Dates updated"
