@@ -134,5 +134,126 @@
             name="index_custom_cnam.repartition_table_exam"
             file="index_custom_cnam.repartition_table_exam"
         />
+
+
+        <template id="emargement_report">
+            <t t-call="web.html_container">
+                <t t-call="edu_management.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                        <t t-if="not company">
+                            <!-- Multicompany -->
+                            <t t-if="company_id">
+                                <t t-set="company" t-value="company_id"/>
+                            </t>
+                            <t t-elif="o and 'company_id' in o">
+                                <t t-set="company" t-value="o.company_id.sudo()"/>
+                            </t>
+                            <t t-else="else">
+                                <t t-set="company" t-value="res_company"/>
+                            </t>
+                        </t>
+                        <t t-set="rooms" t-value="o.exam_repartition_ids.mapped('room')"/>
+                        <t t-set="last_room" t-value="lr"/>
+                        <t t-foreach="rooms" t-as="room">
+                            <div class="page" t-if="not last_room == room">
+                                <t t-set="last_room" t-value="room"/>
+                                <h2 class="text-center">
+                                    Feuille d'émargement d'examen (à retourner avec les copies)
+                                </h2>
+                                <br/><br/>
+                                <div>
+                                    <span>
+                                        Examen de première session <i class="fa fa-square"/> 
+                                    </span>
+                                    <span style="margin-left: 30px;">
+                                        Examen de seconde session <i class="fa fa-square-o"/>
+                                    </span>
+                                </div>
+                                <br/>
+                                <div>
+                                    Expéditeur : Centre Cnam Madagascar
+                                    <br/>
+                                    Unité d'enseignement : 
+                                    <t t-foreach="o.ue_ids" t-as="ue">
+                                        <strong><t t-esc="ue.display_name"/></strong>,
+                                    </t>
+                                </div>
+                                <br/>
+                                <div>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td>
+                                                Date d'Examen
+                                            </td>
+                                            <td>
+                                                <t t-esc="o.date"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Lieu d'Examen
+                                            </td>
+                                            <td>
+                                                <t t-esc="room"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Heure de début
+                                            </td>
+                                            <td>
+                                                <t t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.start_time) * 60, 60))"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Heure de fin
+                                            </td>
+                                            <td>
+                                                <t t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.end_time) * 60, 60))"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Nombre d'élèves présents
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                    <br/><br/>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td>N° Copie</td>
+                                            <td>N° Auditeur</td>
+                                            <td>Nom et Prénom Elève</td>
+                                            <td>Emargement</td>
+                                        </tr>
+                                        <t t-foreach="o.exam_repartition_ids" t-as="repart">
+                                            <tr t-if="repart.room == room">
+                                                <td></td><td></td><td><t t-esc="repart.student"/></td><td></td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                    <br/><br/>
+                                    Nom(s) et prénom(s) du (des) surveillant(s): .................................................
+                                    <br/><br/>
+                                    Signature du (des) surveillant(s) :
+                                </div>
+                            </div>
+                        </t>
+                    </t>  
+                </t>          
+            </t>
+        </template>
+
+        <report
+                id="exam_emargement_report"
+                model="exam.exam"
+                string="Emmargement"
+                report_type="qweb-pdf"
+                name="index_custom_cnam.emargement_report"
+                file="index_custom_cnam.emargement_report"
+            />
     </data>
 </odoo>
