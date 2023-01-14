@@ -397,5 +397,87 @@
                 name="index_custom_cnam.pv_report"
                 file="index_custom_cnam.pv_report"
             />
+
+
+        <template id="le_report">
+            <t t-call="web.html_container">
+                <t t-call="edu_management.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                        <t t-if="not company">
+                            <!-- Multicompany -->
+                            <t t-if="company_id">
+                                <t t-set="company" t-value="company_id"/>
+                            </t>
+                            <t t-elif="o and 'company_id' in o">
+                                <t t-set="company" t-value="o.company_id.sudo()"/>
+                            </t>
+                            <t t-else="else">
+                                <t t-set="company" t-value="res_company"/>
+                            </t>
+                        </t>
+                            <div class="page">
+                                <h3 class="text-center" style="font-weight:bolder;">N° ..............</h3>
+                                <br/>
+                                <h3 class="text-center" style="font-weight:bolder;">LETTRE D’ENGAGEMENT DE PAIEMENT INTEGRAL</h3>
+                                <br/>
+                                <div style="border: 1px solid black; padding:10px;">
+                                    Nom et prénom: <strong><t t-esc="o.guarantor_lastname +' '+o.guarantor_firstname"/></strong><br/>
+                                    Titulaire du CIN n°<strong><t t-esc="o.guarantor_cin"/></strong> delivré le <strong>03/06/1989</strong><br/>    
+                                    Adresse: <strong><t t-esc="o.guarantor_adress"/></strong><br/>
+                                    N° Tél: <strong><t t-esc="o.guarantor_tel"/></strong><br/>
+                                    Profession: <strong><t t-esc="o.guarantor_work"/></strong><br/>
+
+                                </div>
+                                <div style="border: 1px solid black; padding:10px;" t-if="o.guarantor2_lastname">
+                                    Nom et prénom: <strong><t t-esc="o.guarantor2_lastname +' '+o.guarantor2_firstname"/></strong><br/>
+                                    Titulaire du CIN n° <strong><t t-esc="o.guarantor2_cin"/></strong> delivré le <strong>03/06/1989</strong><br/>    
+                                    Adresse: <strong><t t-esc="o.guarantor2_adress"/></strong><br/>
+                                    N° Tél: <strong><t t-esc="o.guarantor2_tel"/></strong><br/>
+                                    Profession: <strong><t t-esc="o.guarantor2_work"/></strong><br/>
+
+                                </div>
+                                <br/>
+                                <p>Nous susnommé(e)s et soussigné(e)s, co-responsables de l’engagement, nous engageons par la présente, quelque soit le taux de mon assiduité aux cours de l’Unité d’Enseignement auquel je me suis inscrit(e) au centre de formation CNAM<br/>Relative aux frais de formation, qui s’élève à  <strong><t t-esc="o.amount_total_ariary"/></strong> Ariary selon le calendrier ci-après:</p>
+                                <t t-set="count" t-value="1"/>
+                                <div t-foreach="o.payment_inscription_ids" t-as="pi_id">
+                                    <div style="display: inline-block" class="col-4" t-if="count == 1">1er Paiement: </div>
+                                    <div style="display: inline-block" class="col-4" t-else=""><t t-esc="count"/>eme Paiement: </div>
+                                    <div style="display: inline-block" class="col-4 offset-2 text-right">
+                                    Avant le <t t-esc="pi_id.date"/> (<t t-esc="pi_id.name"/>)
+                                    </div>
+                                    <t t-set="count" t-value="count+1"/>
+                                </div>
+                                <p>Pour tout retard de paiement, une majoration de 3% sera appliquée dès le lendemain de la date prévue pour le paiement, et de 0,5% par jour de retard.</p><p>Dans le cas du non respect, de la présente lettre, même d’une seule échéance, l’élève ne pourra prétendre à passer les examens, même en partie et aucun remboursement ne sera accordé</p>
+                                
+                                <div class="text-right">
+                                    Antananarivo le <t t-esc="datetime.date.today()"/>
+                                </div>
+                                <br/><br/>
+                                <table style="width:100%;">
+                                    <tr style="height: 100px;">
+                                        <td style="width:65%;">Les co-responsables</td>
+                                        <td class="text-center">Le Directeur</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td class="text-center">Jocelyn Gabriel RASOANAIVO</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <p style="page-break-after:always"/>
+                    </t>  
+                </t>          
+            </t>
+        </template>
+
+        <report
+                id="le_inscription_report"
+                model="inscription.edu"
+                string="Lettre d'engagement"
+                report_type="qweb-pdf"
+                name="index_custom_cnam.le_report"
+                file="index_custom_cnam.le_report"
+            />
     </data>
 </odoo>
