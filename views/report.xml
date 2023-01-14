@@ -2,6 +2,42 @@
 <odoo>
     <data>
 
+        <template id="internal_layout">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <div class="header">
+                <div class="row">
+                    <div class="col-6" style="font-size: 16px;">
+                        <div><strong>Centre Cnam Madagascar</strong></div>
+                        <div><strong>Maison de Produits 67ha 6ème étage - Antananarivo 101</strong></div>
+                        <div><strong>Tél: +261 20 22 290 19 ; +261 32 53 015 13 ; +261 14 259 35</strong></div>
+                        <div><strong>E-mail: cnam.madagascar@yahoo.com</strong></div>
+                    </div>
+                    <div class="col-4 offset-2">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 100px;"
+                             alt="Logo"/>
+                    </div>
+                </div>
+            </div>
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-raw="0"/>
+            </div>
+        </template>
+
         <template id="report_grouping">
             <t t-call="web.html_container">
                 <t t-call="web.internal_layout">
@@ -224,10 +260,10 @@
                                     <br/><br/>
                                     <table class="table table-bordered">
                                         <tr>
-                                            <td>N° Copie</td>
-                                            <td>N° Auditeur</td>
-                                            <td>Nom et Prénom Elève</td>
-                                            <td>Emargement</td>
+                                            <td><strong>N° Copie</strong></td>
+                                            <td><strong>N° Auditeur</strong></td>
+                                            <td><strong>Nom et Prénom Elève</strong></td>
+                                            <td><strong>Emargement</strong></td>
                                         </tr>
                                         <t t-foreach="o.exam_repartition_ids" t-as="repart">
                                             <tr t-if="repart.room == room">
@@ -241,6 +277,7 @@
                                     Signature du (des) surveillant(s) :
                                 </div>
                             </div>
+                            <p style="page-break-after:always"/>
                         </t>
                     </t>  
                 </t>          
@@ -254,6 +291,177 @@
                 report_type="qweb-pdf"
                 name="index_custom_cnam.emargement_report"
                 file="index_custom_cnam.emargement_report"
+            />
+
+        <template id="repartition_table_exam">
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                            <div class="page">
+                                <div>
+                                    Unités d'enseignement: 
+                                    <t t-foreach="o.ue_ids" t-as="ue">
+                                        <span t-esc="ue.display_name"/>, 
+                                    </t>
+                                </div>
+                                <div>
+                                    Date: <span t-esc="o.date" />
+                                </div>
+                                <div>
+                                    Horaire: <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.start_time) * 60, 60))" /> à <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.end_time) * 60, 60))" />
+                                </div>
+                                <div>
+                                    Centre: <span t-esc="o.centre_ue_id.name" />
+                                </div>
+
+                                <br/><br/><br/>
+                                <h4>REPARTITION:</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Numéro Auditeur</th>
+                                            <th>Etudiant</th>
+                                            <th>Salle</th>
+                                            <th>Table</th>
+                                            <th>Centre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.exam_repartition_ids" t-as="repartition">
+                                            <tr>
+                                                <td><span t-esc="repartition.auditor_number"/></td>
+                                                <td><span t-esc="repartition.student"/></td>
+                                                <td><span t-esc="repartition.room"/></td>
+                                                <td><span t-esc="repartition.table"/></td>
+                                                <td><span t-esc="repartition.centre_ue_id.name"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                <br/>
+                                <div class="row mt4 text-center" style="page-break-after: always; margin-top: 20px;">
+                                    Le tuteur,
+                                </div>
+                            </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+    <report
+            id="exam_repartion_report"
+            model="exam.exam"
+            string="Répartition Salle"
+            report_type="qweb-pdf"
+            name="index_custom_cnam.repartition_table_exam"
+            file="index_custom_cnam.repartition_table_exam"
+        />
+
+
+        <template id="pv_report">
+            <t t-call="web.html_container">
+                <t t-call="index_custom_cnam.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                        <t t-if="not company">
+                            <!-- Multicompany -->
+                            <t t-if="company_id">
+                                <t t-set="company" t-value="company_id"/>
+                            </t>
+                            <t t-elif="o and 'company_id' in o">
+                                <t t-set="company" t-value="o.company_id.sudo()"/>
+                            </t>
+                            <t t-else="else">
+                                <t t-set="company" t-value="res_company"/>
+                            </t>
+                        </t>
+                        <t t-set="rooms" t-value="o.exam_repartition_ids.mapped('room')"/>
+                        <t t-set="last_room" t-value="lr"/>
+                        <t t-foreach="rooms" t-as="room">
+                            <div class="page" t-if="not last_room == room">
+                                <t t-set="last_room" t-value="room"/>
+                                <h2 class="text-center">
+                                    PROCES-VERBAL DU DEROULEMENT DES EPREUVES
+                                </h2>
+                                <br/><br/>
+                                <div>
+                                    <span>
+                                        CENTRE D'EXAMEN: <strong><t t-esc="o.centre_ue_id.name"/></strong>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span>
+                                        SALLE D'EXAMEN: <strong><t t-esc="room"/></strong>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span>
+                                        DATE DE L'EPREUVE: <strong><t t-esc="o.date"/></strong>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span>
+                                        <t t-set="duration" t-value="o.end_time - o.start_time"/>
+                                        DUREE: <strong><t t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(duration) * 60, 60))" /></strong>
+                                    </span>
+                                </div>
+                                <br/>
+                                <br/>
+                                <div>
+                                    <span>
+                                        CODE UE: 
+                                        <t t-foreach="o.ue_ids" t-as="ue">
+                                            <strong><t t-esc="ue.code" /></strong>,
+                                        </t>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span>
+                                        INTITULE UE: 
+                                        <t t-foreach="o.ue_ids" t-as="ue">
+                                            <strong><t t-esc="ue.display_name" /></strong>,
+                                        </t>
+                                    </span>
+                                </div>
+                                <br/><br/>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td></td>
+                                        <td>NOM ET PRENOMS</td>
+                                        <td>EMMARGEMENT</td>
+                                    </tr>
+                                    <tr style="height: 50px;">
+                                        <td rowspan="2">Surveillants</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr style="height: 50px;">
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                <br/>
+                                <br/>
+                                <div style="border: 1px solid black; padding: 50px;">
+                                    <div>OBSERVATIONS ET RELATIONS DES INCIDENTS:</div>
+                                    <div style="height: 300px;"/>
+                                </div>
+                            </div>
+                            <p style="page-break-after:always"/>
+                        </t>
+                    </t>  
+                </t>          
+            </t>
+        </template>
+
+        <report
+                id="pv_exam_report"
+                model="exam.exam"
+                string="Procès Verbal"
+                report_type="qweb-pdf"
+                name="index_custom_cnam.pv_report"
+                file="index_custom_cnam.pv_report"
             />
     </data>
 </odoo>
