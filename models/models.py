@@ -127,9 +127,11 @@ class UnitEnseignementConfig(models.Model):
         print('Merging ue..............')
         print(self.code)
         print(self.name)
-        same_ue_ids = self.search([('code', '=', self.code), ('name', '=', self.name)])
+        same_ue_ids = self.search([('code', '=', self.code)])
         formation_ids = same_ue_ids.mapped('formation_id')
-        self.write({'formation_ids': formation_ids})
+        for formation in formation_ids:
+            if formation not in self.formation_ids:
+                self.write({'formation_ids': [(4, formation.id)]})
         print('Merge Finished')
 
         # Update the field ue of the exam. 
