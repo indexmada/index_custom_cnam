@@ -144,3 +144,8 @@ class UnitEnseignementConfig(models.Model):
         insc_ue_id = self.env['unit.enseigne'].sudo().search([('name.id', 'in', same_ue_ids.mapped("id")), ('name.id', '!=', self.id)])
         for ue_id in insc_ue_id:
             ue_id.write({'name': self.id})
+
+
+        for unit_enseigne in same_ue_ids:
+            if unit_enseigne != self:
+                unit_enseigne.unlink()
