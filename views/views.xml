@@ -43,5 +43,18 @@
     <record id="default_record_year_7" model="year.year">
         <field name="name">7</field>
     </record>
+
+    <record id="inscription_edu_form_inherit" model="ir.ui.view">
+        <field name="name">inscription_edu.inherit</field>
+        <field name="model">inscription.edu</field>
+        <field name="inherit_id" ref="edu_management.inscription_edu_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='units_enseignes']/tree/field[@name='name']" position="replace">
+                <field name="name"
+                    domain="[('id', 'in', parent.ue_permitted_ids), ('id', 'not in', parent.ue_selected_ids)]"
+                    string="Intitulé"/>
+            </xpath>
+        </field>
+    </record>
   </data>
 </odoo>
