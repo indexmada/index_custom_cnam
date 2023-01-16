@@ -14,22 +14,34 @@
                 <field name="formation_id" string="Save Formation"/>
                 <field name="formation_ids" widget="many2many_tags"/>
             </xpath>
+            <xpath expr="//field[@name='year']" position="replace">
+                <field name="year" string="Save Année"/>
+                <field name="years" widget="many2many_tags"/>
+            </xpath>
         </field>
     </record>
 
-    <!-- Server action merging UE -->
-<!--     <record id="ir_actions_server_action_merge_ue" model="ir.actions.server">
-        <field name="name">Merge UE</field>
-        <field name="model_id" ref="edu_management.model_unit_enseigne_config" />
-        <field name="state">code</field>
-        <field name="code">
-#Merge Unit.ensigne.config
-if len(records)>1:
-  raise Warning('Choisissez une unité d\'enseignement')
-
-else:
-  record.merge_ue()
-        </field> -->
-   <!--  </record> -->
+    <!-- Default Record for Year -->
+    <record id="default_record_year_1" model="year.year">
+        <field name="name">1</field>
+    </record>
+    <record id="default_record_year_2" model="year.year">
+        <field name="name">2</field>
+    </record>
+    <record id="default_record_year_3" model="year.year">
+        <field name="name">3</field>
+    </record>
+    <record id="default_record_year_4" model="year.year">
+        <field name="name">4</field>
+    </record>
+    <record id="default_record_year_5" model="year.year">
+        <field name="name">5</field>
+    </record>
+    <record id="default_record_year_6" model="year.year">
+        <field name="name">6</field>
+    </record>
+    <record id="default_record_year_7" model="year.year">
+        <field name="name">7</field>
+    </record>
   </data>
 </odoo>

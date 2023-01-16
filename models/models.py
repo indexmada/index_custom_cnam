@@ -112,6 +112,11 @@ class ExamRoom(models.Model):
             else:
                 room.state = 'free'
 
+class Year(models.Model):
+    _name="year.year"
+
+    name = fields.Integer("Année")
+
 
 class UnitEnseignementConfig(models.Model):
     _inherit = 'unit.enseigne.config'
@@ -121,17 +126,27 @@ class UnitEnseignementConfig(models.Model):
             record.formation_ids = record.formation_id
 
     formation_ids = fields.Many2many("training.edu", string="Formations", default=_get_default_formation_ids)
+    years = fields.Many2many("year.year", string="Années")
 
     def merge_ue(self):
         print('*'*100)
         print('Merging ue..............')
         print(self.code)
         print(self.name)
+        # Merge Formation
         same_ue_ids = self.search([('code', '=', self.code)])
         formation_ids = same_ue_ids.mapped('formation_id')
         for formation in formation_ids:
             if formation not in self.formation_ids:
                 self.write({'formation_ids': [(4, formation.id)]})
+
+        # Merge Year
+        years = same_ue_ids.mapped('year')
+        for year in years:
+            year_id = self.env['year.year'].sudo().search([('name', '=', year)])
+            if year_id and year_id not in self.years:
+                self.write({'years':[(4, year_id.id)]})
+
         print('Merge Finished')
 
         # Update the field ue of the exam. 
