@@ -112,3 +112,21 @@ class ExamRoom(models.Model):
             else:
                 room.state = 'free'
 
+
+class UnitEnseignementConfig(models.Model):
+    _inherit = 'unit.enseigne.config'
+
+    def _get_default_formation_ids(self):
+        for record in self:
+            record.formation_ids = record.formation_id
+
+    formation_ids = fields.Many2many("training.edu", string="Formations", default=_get_default_formation_ids)
+
+    def merge_ue(self):
+        print('*'*100)
+        print('Merging ue..............')
+        print(self.code)
+        print(self.name)
+        formation_ids = self.search([('code', '=', self.code), ('name', '=', self.name)]).mapped('formation_id')
+        self.write({'formation_ids': formation_ids})
+        print('Merge Finished')
