@@ -127,6 +127,20 @@ class UnitEnseignementConfig(models.Model):
         print('Merging ue..............')
         print(self.code)
         print(self.name)
-        formation_ids = self.search([('code', '=', self.code), ('name', '=', self.name)]).mapped('formation_id')
+        same_ue_ids = self.search([('code', '=', self.code), ('name', '=', self.name)])
+        formation_ids = same_ue_ids.mapped('formation_id')
         self.write({'formation_ids': formation_ids})
         print('Merge Finished')
+
+        # Update the field ue of the exam. 
+        exam_ids = self.env['exam.exam'].sudo().search([])
+        for exam in exam_ids:
+            if len(exam.ue_ids)>1 and self in exam.ue_ids:
+                for ue in exam.ue_ids:
+                    if ue != self and ue in same_ue_ids:
+                        exam.write({'ue_ids': [(3, ue.id)]})
+
+        # Update the field ue of the Unité d'enseignement and Autre UE dans Inscription
+        insc_ue_id = self.env['unit.enseigne'].sudo().search([('name.id', 'in', same_ue_ids.mapped("id")), ('name.id', '!=', self.id)])
+        for ue_id in insc_ue_id:
+            ue_id.write({'name': self.id})
