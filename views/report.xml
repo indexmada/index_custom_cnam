@@ -422,7 +422,7 @@
                                 <h3 class="text-center" style="font-weight:bolder;">LETTRE D’ENGAGEMENT DE PAIEMENT INTEGRAL</h3>
                                 <br/>
                                 <div style="border: 1px solid black; padding:10px;">
-                                    Nom et prénom: <strong><t t-esc="o.guarantor_lastname +' '+o.guarantor_firstname"/></strong><br/>
+                                    Nom et prénom: <strong><t t-esc="(o.guarantor_lastname or '') +' '+(o.guarantor_firstname or '')"/></strong><br/>
                                     Titulaire du CIN n°<strong><t t-esc="o.guarantor_cin"/></strong> delivré le <strong>03/06/1989</strong><br/>    
                                     Adresse: <strong><t t-esc="o.guarantor_adress"/></strong><br/>
                                     N° Tél: <strong><t t-esc="o.guarantor_tel"/></strong><br/>
@@ -430,7 +430,7 @@
 
                                 </div>
                                 <div style="border: 1px solid black; padding:10px;" t-if="o.guarantor2_lastname">
-                                    Nom et prénom: <strong><t t-esc="o.guarantor2_lastname +' '+o.guarantor2_firstname"/></strong><br/>
+                                    Nom et prénom: <strong><t t-esc="(o.guarantor2_lastname or '') +' '+(o.guarantor2_firstname or '')"/></strong><br/>
                                     Titulaire du CIN n° <strong><t t-esc="o.guarantor2_cin"/></strong> delivré le <strong>03/06/1989</strong><br/>    
                                     Adresse: <strong><t t-esc="o.guarantor2_adress"/></strong><br/>
                                     N° Tél: <strong><t t-esc="o.guarantor2_tel"/></strong><br/>
