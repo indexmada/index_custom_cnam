@@ -4,6 +4,13 @@ from odoo import models, fields, api
 import json
 from datetime import datetime
 
+SELECTION_STATE = [
+    ('pre-inscription', 'Pré-inscription'),
+    ('accueil', 'Validé Acceuil'),
+    ('account', 'Validé comptable'),
+    ('enf', 'Validé ENF'),
+    ('cancel', 'Annulé')
+]
 
 class index_custom_cnam(models.Model):
     _inherit = "regrouping.center.line"
@@ -166,3 +173,46 @@ class UnitEnseignementConfig(models.Model):
         for unit_enseigne in same_ue_ids:
             if unit_enseigne != self:
                 unit_enseigne.unlink()
+
+class InscriptionEducation(models.Model):
+    _inherit="inscription.edu"
+
+    @api.depends("surname", "name_marital", "firstname")
+    def compute_display_name(self):
+        for insc in self:
+            insc.display_name = "%s %s %s" % (insc.surname, insc.name_marital, insc.firstname)
+
+class UEReport(models.Model):
+    _inherit = "unit.enseigne"
+
+    @api.model
+    def default_insc_state(self):
+        for record in self:
+            print('*'*100) 
+            print('here')
+            if record.inscription_id:
+                record.inscri_state = record.inscription_id.state
+            elif record.inscription_other_id:
+                record.inscri_state = record.inscription_other_id.state
+
+
+
+    insc_date = fields.Date("Date d'inscription", compute="compute_insc_date")
+    global_insc = fields.Many2one("inscription.edu", string="Etudiant", compute="get_global_insc")
+    inscri_state = fields.Selection(SELECTION_STATE, string="Statut", compute="get_insc_state", default=default_insc_state, store=True)
+
+    def get_global_insc(self):
+        for record in self:
+            record.global_insc = record.inscription_id or record.inscription_other_id
+
+    def compute_insc_date(self):
+        for record in self:
+            record.insc_date = record.inscription_id.date or record.inscription_other_id.date
+
+    @api.depends("inscription_id", "inscription_other_id", "inscription_id.state", "inscription_other_id.state")
+    def get_insc_state(self):
+        for record in self:
+            if record.inscription_id:
+                record.inscri_state = record.inscription_id.state
+            elif record.inscription_other_id:
+                record.inscri_state = record.inscription_other_id.state

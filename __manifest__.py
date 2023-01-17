@@ -33,6 +33,7 @@
         'views/report.xml',
         'views/invoice_view.xml',
         'views/cron.xml',
+        'views/sale_analysis.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
