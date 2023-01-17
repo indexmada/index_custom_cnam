@@ -25,6 +25,8 @@ class index_custom_cnam(models.Model):
     school_year_id = fields.Many2one("school.year", "Année Universitaire", required=True,compute='compute_school_year')
     grouping_date = fields.Date("Date du regroupement", store=False, compute="_get_grouping_date")
 
+    student_pointed_ids = fields.Many2many("assignment.student", "regrouping_line_id", string="Pointage", domain="[('id', 'in', assignement_ids)]")
+
     def _get_grouping_date(self):
         for record in self:
             record.grouping_date = record.regrouping_id.date
