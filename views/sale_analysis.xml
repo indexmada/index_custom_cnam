@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="insc_date"/>
+                <field name="n_auditeur"/>
                 <field name="global_insc"/>
                 <field name="name"/>
                 <field name="cost_ariary" sum='Total Tax' string="Coût Total"/>
@@ -21,6 +22,7 @@
         <field name="model">unit.enseigne</field>
         <field name="arch" type="xml">
         	<search string="Search Prestation">
+                <filter name="group_by_ue" string="Unités d'enseignement" context="{'group_by': 'name'}"/>
 	            <filter name="currency_id" string="Devise" context="{'group_by':'currency_id'}"/>
 	            <filter name="inscri_state" string="Statut" context="{'group_by':'inscri_state'}"/>
 	            <filter name="filter_inscr_state_account" string="Validé comptable" domain="[('inscri_state', '=', 'account')]"/>
@@ -36,15 +38,20 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">unit.enseigne</field>
         <field name="view_mode">tree,search</field>
-        <field name="context">{'search_default_currency_id': 1}</field>
+        <field name="context">{'search_default_group_by_ue': 1}</field>
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
            Analyse de vente des UE. 
           </p>
         </field>
     </record>
+    <menuitem id="analysis_menu"
+            name="Analyse"
+            parent="edu_management.menu_education" sequence="49"/>
+
 	<menuitem id="menu_sale_analysis"
         name="Analyse / Vente"
         action="sale_analysis_action"
-        parent="edu_management.menu_edu_configuration" sequence="1" />
+        parent="index_custom_cnam.analysis_menu" sequence="1" />
+
 </odoo>

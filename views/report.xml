@@ -479,5 +479,85 @@
                 name="index_custom_cnam.le_report"
                 file="index_custom_cnam.le_report"
             />
+
+<!-- Attestation de réussite -->
+        <template id="att_re_report">
+            <t t-call="web.html_container">
+                <t t-call="edu_management.internal_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                        <t t-if="not company">
+                            <!-- Multicompany -->
+                            <t t-if="company_id">
+                                <t t-set="company" t-value="company_id"/>
+                            </t>
+                            <t t-elif="o and 'company_id' in o">
+                                <t t-set="company" t-value="o.company_id.sudo()"/>
+                            </t>
+                            <t t-else="else">
+                                <t t-set="company" t-value="res_company"/>
+                            </t>
+                        </t>
+                            <div class="page">
+                                <h2 class="text-center"><strong>ATTESTATION DE REUSSITE</strong></h2>
+                                <br/>
+                                <div class="text-center">
+                                    Le Directeur du Conservatoire National des Arts et Métiers Madagascar atteste que :
+                                </div>
+                                <h3 class="text-center"><strong><t t-esc="(o.name or '')+' '+(o.first_name or '')"/></strong></h3>
+                                <br/>
+                                <div>
+                                    <strong>Né(e) le: </strong><t t-esc="o.date_of_birth"/>
+                                </div>
+                                <div>
+                                    <strong>Inscrit(e) au diplôme :</strong>TITRE PROFESSIONNEL RNCP NIVEAU 6 Responsable ressources humaines
+                                </div>
+                                <br/>
+                                <div>A obtenu les Unités d'Enseignement suivantes durant l'année universitaire 2021 - 2022 :</div><br/>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td>N° UE</td>
+                                        <td>Intitulé</td>
+                                        <td>Note /20</td>
+                                    </tr>
+                                    <tr>
+                                        <td><t t-esc="o.note_list_filter_id.unit_enseigne.code"/></td>
+                                        <td><t t-esc="o.note_list_filter_id.unit_enseigne.display_name"/></td>
+                                        <td t-esc="o.note_sem2 or o.note_sem1"/>
+                                    </tr>
+                                </table>
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                <div class="row">
+                                    <div class="offset-8  text-center">Fait à Antananarivo, le
+                                        <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y')"/>
+                                        <br/>
+                                        Le directeur
+                                        <div>
+                                          <img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
+                                        </div>
+                                    <br/>
+
+                                      Jocelyn G. RASOANAIVO
+                                     </div>
+                                </div>
+                            </div>
+                            <p style="page-break-after:always"/>
+                    </t>  
+                </t>          
+            </t>
+        </template>
+
+        <report
+                id="attestation_reussite_report"
+                model="note.list"
+                string="ATTESTATION"
+                report_type="qweb-pdf"
+                name="index_custom_cnam.att_re_report"
+                file="index_custom_cnam.att_re_report"
+            />
+
+
     </data>
 </odoo>

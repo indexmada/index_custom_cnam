@@ -200,6 +200,11 @@ class UEReport(models.Model):
     insc_date = fields.Date("Date d'inscription", compute="compute_insc_date")
     global_insc = fields.Many2one("inscription.edu", string="Etudiant", compute="get_global_insc")
     inscri_state = fields.Selection(SELECTION_STATE, string="Statut", compute="get_insc_state", default=default_insc_state, store=True)
+    n_auditeur = fields.Char("Numéro auditeur", compute="get_n_auditeur")
+
+    def get_n_auditeur(self):
+        for record in self:
+            record.n_auditeur = record.global_insc.name
 
     def get_global_insc(self):
         for record in self:
