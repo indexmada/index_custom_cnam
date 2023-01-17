@@ -50,7 +50,7 @@
             parent="edu_management.menu_education" sequence="49"/>
 
 	<menuitem id="menu_sale_analysis"
-        name="Analyse / Vente"
+        name="Vente"
         action="sale_analysis_action"
         parent="index_custom_cnam.analysis_menu" sequence="1" />
 
