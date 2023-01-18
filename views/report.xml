@@ -416,7 +416,7 @@
                                 <t t-set="company" t-value="res_company"/>
                             </t>
                         </t>
-                            <div class="page">
+                            <div class="page" style="font-family:Arial;">
                                 <h3 class="text-center" style="font-weight:bolder;">N° ..............</h3>
                                 <br/>
                                 <h3 class="text-center" style="font-weight:bolder;">LETTRE D’ENGAGEMENT DE PAIEMENT INTEGRAL</h3>
@@ -444,23 +444,27 @@
                                     <div style="display: inline-block" class="col-4" t-if="count == 1">1er Paiement: </div>
                                     <div style="display: inline-block" class="col-4" t-else=""><t t-esc="count"/>eme Paiement: </div>
                                     <div style="display: inline-block" class="col-4 offset-2 text-right">
-                                    Avant le <t t-esc="pi_id.date"/> (<t t-esc="pi_id.name"/>)
+                                    Avant le <t t-esc="pi_id.date.strftime('%d-%m-%Y')"/> (<t t-esc="pi_id.name"/>)
                                     </div>
                                     <t t-set="count" t-value="count+1"/>
                                 </div>
                                 <p>Pour tout retard de paiement, une majoration de 3% sera appliquée dès le lendemain de la date prévue pour le paiement, et de 0,5% par jour de retard.</p><p>Dans le cas du non respect, de la présente lettre, même d’une seule échéance, l’élève ne pourra prétendre à passer les examens, même en partie et aucun remboursement ne sera accordé</p>
                                 
                                 <div class="text-right">
-                                    Antananarivo le <t t-esc="datetime.date.today()"/>
+                                    Antananarivo le <t t-esc="datetime.date.today().strftime('%d-%m-%Y')"/>
                                 </div>
                                 <br/><br/>
                                 <table style="width:100%;">
-                                    <tr style="height: 100px;">
+                                    <tr>
                                         <td style="width:65%;">Les co-responsables</td>
                                         <td class="text-center">Le Directeur</td>
                                     </tr>
                                     <tr>
-                                        <td></td>
+                                        <td/>
+                                        <td class="text-center"><img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td/>
                                         <td class="text-center">Jocelyn Gabriel RASOANAIVO</td>
                                     </tr>
                                 </table>
