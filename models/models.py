@@ -72,7 +72,7 @@ class RegroupingCentre(models.Model):
     @api.depends("reg_date_begin")
     def compute_reg_date_begin(self):
         for reg in self:
-            min = 100
+            min = 23.5
             for line in reg.regrouping_line_ids:
                 if min > line.begin_hours:
                     min = line.begin_hours
