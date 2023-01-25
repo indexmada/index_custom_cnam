@@ -229,7 +229,17 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                Lieu d'Examen
+                                                Lieu de l'examen
+                                            </td>
+                                            <td>
+                                                <t t-foreach="o.center_ids" t-as="center">
+                                                    <span t-esc="center.name"/>, 
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Salle de l'examen
                                             </td>
                                             <td>
                                                 <t t-esc="room"/>
@@ -322,7 +332,11 @@
                                 <br/><br/>
                                 <div>
                                     <span>
-                                        CENTRE D'EXAMEN: <strong><t t-esc="o.centre_ue_id.name"/></strong>
+                                        CENTRE D'EXAMEN: <strong>
+                                            <t t-foreach="o.center_ids" t-as="center">
+                                                <t t-esc="center.name"/>, 
+                                            </t>
+                                        </strong>
                                     </span>
                                 </div>
                                 <div>

@@ -10,6 +10,11 @@ class ExamRepartition(models.Model):
 
     inscription_id = fields.Many2one("inscription.edu", string="Inscription")
 
+class ConvocationList(models.Model):
+    _inherit="convocation.list"
+
+    inscription_id = fields.Many2one("inscription.edu", string="Inscription")
+
 class index_custom_cnam(models.Model):
     _inherit = "exam.calandar"
 
@@ -108,19 +113,28 @@ class index_custom_cnam(models.Model):
                         exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':unit_enseignes.inscription_id.name, 'student':student, 'room': room_available, 'table': place_available, 'inscription_id': unit_enseignes.inscription_id.id})]})
                         student_list.append(student)
 
-                        vals = {
-                            'date': self.create_date.date(),
-                            'student_id': student,
-                            'formation_id': unit_enseignes.inscription_id.formation_id.id,
-                            'auditor_number': unit_enseignes.inscription_id.name,
-                            'address_name': unit_enseignes.inscription_id.adress,
-                            'school_year': self.school_year.id,
-                            'exam_id': exam.id,
-                            'line_ids': [(0,0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
+                        convocation_student = self.env['convocation.list'].sudo().search([('school_year', '=', self.school_year.id), ('inscription_id', '=', unit_enseignes.inscription_id.id)], limit=1)
+                        if convocation_student:
+                            convocation_student.write({'line_ids': [(0, 0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
                                     'date':exam.date,'start_time':exam.start_time,
-                                    'end_time':exam.end_time,'room':room_available,'table':place_available})]
-                            }
-                        self.env['convocation.list'].create(vals)
+                                    'end_time':exam.end_time,'room':room_available,'table':place_available})]})
+                            exam.write({'convocation_ids': [(4,convocation_student.id)]})
+                        else:
+                            vals = {
+                                'date': self.create_date.date(),
+                                'student_id': student,
+                                'formation_id': unit_enseignes.inscription_id.formation_id.id,
+                                'auditor_number': unit_enseignes.inscription_id.name,
+                                'address_name': unit_enseignes.inscription_id.adress,
+                                'school_year': self.school_year.id,
+                                'exam_ids': [(4, exam.id)],
+                                'inscription_id': unit_enseignes.inscription_id.id,
+                                'line_ids': [(0,0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
+                                        'date':exam.date,'start_time':exam.start_time,
+                                        'end_time':exam.end_time,'room':room_available,'table':place_available})]
+                                }
+                            new_convocation = self.env['convocation.list'].create(vals)
+                            exam.write({'convocation_ids': [(4,new_convocation.id)]})
 
 
     def get_existant_student(self, exam):
