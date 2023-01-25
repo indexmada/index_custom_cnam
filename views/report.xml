@@ -43,7 +43,7 @@
                 <t t-call="web.internal_layout">
                     <t t-foreach="docs" t-as="o">
                         <t t-set="o" t-value="o.with_context(lang=lang)" />
-                            <div class="page">
+                            <div class="page" style="font-family: 'arial';">
                                 <h2 class="text-center"> 
                                     Regroupement:
                                     <span t-esc="o.ue_config_id.name"/>
@@ -108,10 +108,10 @@
 
         <template id="repartition_table_exam">
             <t t-call="web.html_container">
-                <t t-call="web.internal_layout">
+                <t t-call="edu_management.internal_layout">
                     <t t-foreach="docs" t-as="o">
                         <t t-set="o" t-value="o.with_context(lang=lang)" />
-                            <div class="page">
+                            <div class="page" style="font-family: 'arial';">
                                 <div>
                                     Unités d'enseignement: 
                                     <t t-foreach="o.ue_ids" t-as="ue">
@@ -125,7 +125,10 @@
                                     Horaire: <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.start_time) * 60, 60))" /> à <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.end_time) * 60, 60))" />
                                 </div>
                                 <div>
-                                    Centre: <span t-esc="o.centre_ue_id.name" />
+                                    Centre d'examen: 
+                                    <t t-foreach="o.center_ids" t-as="center">
+                                        <t t-esc="center.name"/>, 
+                                    </t>
                                 </div>
 
                                 <br/><br/><br/>
@@ -137,23 +140,21 @@
                                             <th>Etudiant</th>
                                             <th>Salle</th>
                                             <th>Table</th>
-                                            <th>Centre</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <t t-foreach="o.exam_repartition_ids" t-as="repartition">
                                             <tr>
                                                 <td><span t-esc="repartition.auditor_number"/></td>
-                                                <td><span t-esc="repartition.student"/></td>
+                                                <td><span t-esc="(repartition.inscription_id.surname or '')+' '+(repartition.inscription_id.firstname or '')"/></td>
                                                 <td><span t-esc="repartition.room"/></td>
                                                 <td><span t-esc="repartition.table"/></td>
-                                                <td><span t-esc="repartition.centre_ue_id.name"/></td>
                                             </tr>
                                         </t>
                                     </tbody>
                                 </table>
                                 <br/>
-                                <div class="row mt4 text-center" style="page-break-after: always; margin-top: 20px;">
+                                <div class="text-center" style="page-break-after: always; margin-top: 20px;">
                                     Le tuteur,
                                 </div>
                             </div>
@@ -192,7 +193,7 @@
                         <t t-set="rooms" t-value="o.exam_repartition_ids.mapped('room')"/>
                         <t t-set="last_room" t-value="lr"/>
                         <t t-foreach="rooms" t-as="room">
-                            <div class="page" t-if="not last_room == room">
+                            <div class="page" t-if="not last_room == room" style="font-family: 'arial';">
                                 <t t-set="last_room" t-value="room"/>
                                 <h2 class="text-center">
                                     Feuille d'émargement d'examen (à retourner avec les copies)
@@ -313,7 +314,7 @@
                         <t t-set="rooms" t-value="o.exam_repartition_ids.mapped('room')"/>
                         <t t-set="last_room" t-value="lr"/>
                         <t t-foreach="rooms" t-as="room">
-                            <div class="page" t-if="not last_room == room">
+                            <div class="page" t-if="not last_room == room" style="font-family: 'arial';">
                                 <t t-set="last_room" t-value="room"/>
                                 <h2 class="text-center">
                                     PROCES-VERBAL DU DEROULEMENT DES EPREUVES
@@ -416,7 +417,7 @@
                                 <t t-set="company" t-value="res_company"/>
                             </t>
                         </t>
-                            <div class="page" style="font-family:Arial;">
+                            <div class="page" style="font-family: 'arial';">
                                 <h3 class="text-center" style="font-weight:bolder;">N° ..............</h3>
                                 <br/>
                                 <h3 class="text-center" style="font-weight:bolder;">LETTRE D’ENGAGEMENT DE PAIEMENT INTEGRAL</h3>
@@ -465,7 +466,7 @@
                                     </tr>
                                     <tr>
                                         <td/>
-                                        <td class="text-center">Jocelyn Gabriel RASOANAIVO</td>
+                                        <td class="text-center">Jocelyn RASOANAIVO</td>
                                     </tr>
                                 </table>
                             </div>
@@ -502,7 +503,7 @@
                                 <t t-set="company" t-value="res_company"/>
                             </t>
                         </t>
-                            <div class="page">
+                            <div class="page" style="font-family: 'arial';">
                                 <h2 class="text-center"><strong>ATTESTATION DE REUSSITE</strong></h2>
                                 <br/>
                                 <div class="text-center">
@@ -510,14 +511,16 @@
                                 </div>
                                 <h3 class="text-center"><strong><t t-esc="(o.name or '')+' '+(o.first_name or '')"/></strong></h3>
                                 <br/>
+                                <t t-set="student" t-value="o.env['inscription.edu'].sudo().search([('student_id', '=', o.partner_id.id)], limit=1)"/>
                                 <div>
                                     <strong>Né(e) le: </strong><t t-esc="o.date_of_birth"/>
                                 </div>
                                 <div>
-                                    <strong>Inscrit(e) au diplôme :</strong>TITRE PROFESSIONNEL RNCP NIVEAU 6 Responsable ressources humaines
+                                    <strong>Inscrit(e) au diplôme : </strong><t t-esc="student.formation_id.name"/>
                                 </div>
                                 <br/>
-                                <div>A obtenu les Unités d'Enseignement suivantes durant l'année universitaire 2021 - 2022 :</div><br/>
+                                <t t-set="au" t-value="student.school_year.name"/>
+                                <div>A obtenu les Unités d'Enseignement suivantes durant l'année universitaire  : <span t-esc="au or ''" /></div><br/>
                                 <table class="table table-bordered">
                                     <tr>
                                         <td>N° UE</td>
@@ -532,18 +535,22 @@
                                 </table>
                                     <br/>
                                     <br/>
-                                    <br/>
+                                    
+                                <div>
+                                    Cette attestation lui est délivrée pour lui servir et valoir ce que de droit.
+                                </div>
+                                <br/>
                                 <div class="row">
                                     <div class="offset-8  text-center">Fait à Antananarivo, le
                                         <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y')"/>
-                                        <br/>
-                                        Le directeur
+                                        <br/><br/>
+                                        Pour l'Administratrice Générale et par délégation
                                         <div>
                                           <img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
                                         </div>
                                     <br/>
-
-                                      Jocelyn G. RASOANAIVO
+                                    Le Directeur du centre<br/>
+                                    Jocelyn RASOANAIVO
                                      </div>
                                 </div>
                             </div>

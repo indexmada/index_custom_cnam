@@ -5,6 +5,11 @@ import json
 from datetime import datetime
 from datetime import timedelta
 
+class ExamRepartition(models.Model):
+    _inherit ="exam.repartition"
+
+    inscription_id = fields.Many2one("inscription.edu", string="Inscription")
+
 class index_custom_cnam(models.Model):
     _inherit = "exam.calandar"
 
@@ -100,7 +105,7 @@ class index_custom_cnam(models.Model):
                     if student not in student_list:
                         room_available = self.get_avalaible_room(exam.date, exam.start_time, exam.end_time)
                         place_available = self.get_avalaible_place(room_available, exam.date, exam.start_time, exam.end_time)
-                        exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':unit_enseignes.inscription_id.name, 'student':student, 'room': room_available, 'table': place_available})]})
+                        exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':unit_enseignes.inscription_id.name, 'student':student, 'room': room_available, 'table': place_available, 'inscription_id': unit_enseignes.inscription_id.id})]})
                         student_list.append(student)
 
                         vals = {
