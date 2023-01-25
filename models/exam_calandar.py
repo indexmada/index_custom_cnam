@@ -32,8 +32,10 @@ class index_custom_cnam(models.Model):
 
         return 'afternoon'
 
+    def there_is_overlap(self, nb1,nb2,ch3,ch4):
+        return not((nb1 < ch3 and nb2 < ch3) or (nb1 > ch4 and nb2 > ch4))
+
     def get_available_day(self,day, time_from = 8.0, time_to = 12.0):
-        print('*'*100)
         week_day = self.get_week_day_of_date(day) #Return int 0:lundi, 1:mardi,...
         attendance_ok = False
         for attendance in self.calandar_id.attendance_ids:
@@ -46,13 +48,17 @@ class index_custom_cnam(models.Model):
             return False
         for exam in self.exam_ids:
             if (exam.date and exam.start_time and exam.end_time):
-                exam_week_day = self.get_week_day_of_date(exam.date)
-                if(exam.start_time<12):
-                    start_time = 8
-                else:
-                    start_time = 13
-                if (day == exam.date and time_from == start_time):
+                # exam_week_day = self.get_week_day_of_date(exam.date)
+                # if(exam.start_time<12):
+                #     start_time = 8
+                # else:
+                #     start_time = 13
+                # if (day == exam.date and time_from == start_time):
+                #     return False
+
+                if self.there_is_overlap(time_from, time_to, exam.start_time, exam.end_time) and day == exam.date:
                     return False
+
         return {'date': day, 'start_time': time_from, 'end_time': time_to}
 
 
@@ -60,25 +66,51 @@ class index_custom_cnam(models.Model):
     def recalculate(self):                    
         self.calculate()
 
+    def get_default_start_and_end_time_for_date(self, date, after):
+        date_dayofweek = date.weekday() #Return int 0:lundi, 1:mardi,...
+        hfrom = False
+        hto = False
+        for attendance in self.calandar_id.attendance_ids.filtered(lambda at: (int(at.dayofweek) == int(date_dayofweek)) and (float(at.hour_from) > float(after)) ):
+            if not hfrom:
+                hfrom = attendance.hour_from
+                hto = attendance.hour_to
+            elif attendance.hour_from < hfrom:
+                hfrom = attendance.hour_from
+                hto = attendance.hour_to
+        return [hfrom, hto]
+
+
+
+
     def request_available_date(self):
         date_request = self.start_date
         s = 8 #default start_time
         e = 12 #default end_time
+        tab_hours_ft = self.get_default_start_and_end_time_for_date(date_request, 6)
+        if tab_hours_ft and len(tab_hours_ft) == 2:
+            if tab_hours_ft[0]:
+                s = tab_hours_ft[0]
+            if tab_hours_ft[1]:
+                e = tab_hours_ft[1]
         request_date = self.get_available_day(date_request, s, e)
         i = 0
         while(not request_date):
-            if s == 8:
-                s = 13
-                e = 17
-            else:
-                s = 8
-                e = 12
+            tab_hours_ft = self.get_default_start_and_end_time_for_date(date_request, e)
+            if tab_hours_ft and len(tab_hours_ft) == 2:
+                if tab_hours_ft[0]:
+                    s = tab_hours_ft[0]
+                if tab_hours_ft[1]:
+                    e = tab_hours_ft[1]
+            if (not tab_hours_ft) or (not tab_hours_ft[0]) or (not tab_hours_ft[1]):
                 date_request = date_request+timedelta(1)
+                e = 6
 
             request_date = self.get_available_day(date_request, s, e)
 
             i += 1
-            if i > 100:
+            if i > 200:
+                print('_'*100)
+                print('No')
                 request_date = 'no'
         return request_date
 
