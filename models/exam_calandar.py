@@ -161,7 +161,7 @@ class index_custom_cnam(models.Model):
                                 'school_year': self.school_year.id,
                                 'exam_ids': [(4, exam.id)],
                                 'inscription_id': unit_enseignes.inscription_id.id,
-                                'line_ids': [(0,0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
+                                'line_ids': [(0,0, {'code':exam.ue_code_string,'display_name':exam.ue_ids_string,
                                         'date':exam.date,'start_time':exam.start_time,
                                         'end_time':exam.end_time,'room':room_available,'table':place_available})]
                                 }

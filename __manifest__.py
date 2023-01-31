@@ -33,7 +33,9 @@
         'views/report.xml',
         'views/invoice_view.xml',
         'views/cron.xml',
-        'views/sale_analysis.xml'
+        'views/sale_analysis.xml',
+        'views/action_manager.xml',
+        'views/wizard_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
