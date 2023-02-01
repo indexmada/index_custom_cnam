@@ -12,16 +12,35 @@ except ImportError:
     import xlsxwriter
 
 XLSX_COLUMN = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','R','S','T','U','V','W','X','Y','Z']
+class AccountBankaStatement(models.Model):
+    _inherit = "account.bank.statement"
+
+    def print_xlsx(self):
+        data = {
+            'statement_id': self.id,
+        }
+        return {
+            'type': 'ir_actions_xlsx_download',
+            'data': {'model': 'example.xlsx.report.wizard',
+                     'options': json.dumps(data, default=date_utils.json_default),
+                     'output_format': 'xlsx',
+                     'report_name': 'Excel Report',
+                    }
+        }   
+        
+
 class ExcelWizard(models.TransientModel):
     _name = "example.xlsx.report.wizard"
     start_date = fields.Date(string="Start Date", default=date.today(), required=True)
     end_date = fields.Date(string="End Date", default=date.today(), required=False)
+    get_model = fields.Char(string="Model", required=False)
     def print_xlsx(self):
         if self.end_date and self.start_date > self.end_date:
             raise ValidationError('Start Date must be less than End Date')
         data = {
             'start_date': self.start_date,
             'end_date': self.end_date,
+            'get_model': self.get_model,
         }
         return {
             'type': 'ir_actions_xlsx_download',
@@ -32,10 +51,169 @@ class ExcelWizard(models.TransientModel):
                     }
         }
     def get_xlsx_report(self, data, response):
-        if data['end_date']:
+        if data.get('statement_id'):
+            self.get_xlsx_report_caisse_by_statement(data, response)
+        elif data.get('get_model') and data['get_model'] == 'rel_caisse':
+            self.get_xlsx_report_rel_caisse(data, response)
+        elif data.get('end_date'):
             self.get_xlsx_report_inscription(data, response)
         else:
             self.get_xlsx_report_grouping(data, response)
+
+    def get_xlsx_report_caisse_by_statement(self, data, response):
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet()
+        cell_format = workbook.add_format({'font_size': '12px'})
+        top_column_format = workbook.add_format({'font_size': '13px', 'bold':True})
+        head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
+        txt = workbook.add_format({'font_size': '10px'})       
+        
+        statement = self.env['account.bank.statement'].sudo().browse(int(data.get('statement_id')))
+
+        sheet.merge_range('A1:D2', "RELEVE DE CAISSE: "+statement.journal_id.name, head)
+        column = XLSX_COLUMN
+        top_column = ['Réference', 'Libellé', 'Débit', 'Crédit']
+
+        line = 5
+        count = 0
+        for content in top_column:
+            cell = column[count]+str(line)
+            sheet.write(cell, content, top_column_format)
+            count +=1
+
+        line +=1
+        amount_debit = 0
+        amount_credit = 0
+
+        for line_id in statement.mapped('line_ids'):
+            count = 0
+
+            # Réference
+            cell = column[count]+str(line)
+            sheet.write(cell, line_id.ref, cell_format)
+
+            # Libellé
+            count +=1
+            cell = column[count]+str(line)
+            sheet.write(cell, line_id.name, cell_format)
+
+            # Débit (Les montants Négatif) Crédit (Les montants Positifs)
+            if line_id.amount < 0:
+                count+=1
+                amount = abs(line_id.amount)
+                amount_debit += amount
+            else:
+                count+=2
+                amount = line_id.amount
+                amount_credit += amount
+            cell = column[count]+str(line)
+            sheet.write(cell, amount, cell_format)
+
+            line +=1
+
+        # Total
+        count = 0
+        cell = column[count]+str(line)
+        sheet.write(cell, 'Total', top_column_format)
+        count +=2
+        cell = column[count]+str(line)
+        sheet.write(cell, amount_debit, top_column_format)
+        count +=1
+        cell = column[count]+str(line)
+        sheet.write(cell, amount_credit, top_column_format)
+
+        # Total Chèque + Bank
+        line +=1
+        count= 0
+        cell = column[count]+str(line)
+        sheet.write(cell, '', top_column_format)
+        count += 3
+        cell = column[count]+str(line)
+        sheet.write(cell, abs(amount_debit - amount_credit), top_column_format)
+
+
+        workbook.close()
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
+
+    def get_xlsx_report_rel_caisse(self, data, response):
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        sheet = workbook.add_worksheet()
+        cell_format = workbook.add_format({'font_size': '12px'})
+        top_column_format = workbook.add_format({'font_size': '13px', 'bold':True})
+        head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
+        txt = workbook.add_format({'font_size': '10px'})       
+
+        sheet.merge_range('A1:D2', "RELEVE DE CAISSE", head)
+        column = XLSX_COLUMN
+        top_column = ['Réference', 'Libellé', 'Débit', 'Crédit']
+
+        line = 5
+        count = 0
+        for content in top_column:
+            cell = column[count]+str(line)
+            sheet.write(cell, content, top_column_format)
+            count +=1
+
+        line +=1
+        amount_debit = 0
+        amount_credit = 0
+
+        line_ids = self.env['account.bank.statement.line'].sudo().search([('date', '>=', data['start_date']), ('date','<=', data['end_date'])])
+        for line_id in line_ids:
+            count = 0
+
+            # Réference
+            cell = column[count]+str(line)
+            sheet.write(cell, line_id.ref, cell_format)
+
+            # Libellé
+            count+=1
+            cell = column[count]+str(line)
+            sheet.write(cell, line_id.name, cell_format)
+
+            # Débit (Les montants Négatif) Crédit (Les montants Positifs)
+            if line_id.amount < 0:
+                count+=1
+                amount = abs(line_id.amount)
+                amount_debit += amount
+            else:
+                count+=2
+                amount = line_id.amount
+                amount_credit += amount
+            cell = column[count]+str(line)
+            sheet.write(cell, amount, cell_format)
+
+            line +=1
+
+        # Total
+        count = 0
+        cell = column[count]+str(line)
+        sheet.write(cell, 'Total', top_column_format)
+        count +=2
+        cell = column[count]+str(line)
+        sheet.write(cell, amount_debit, top_column_format)
+        count +=1
+        cell = column[count]+str(line)
+        sheet.write(cell, amount_credit, top_column_format)
+
+        # Total Chèque + Bank
+        line +=1
+        count= 0
+        cell = column[count]+str(line)
+        sheet.write(cell, 'TOTAL CHEQUES + ESPECES', top_column_format)
+        count += 3
+        cell = column[count]+str(line)
+        sheet.write(cell, abs(amount_debit - amount_credit), top_column_format)
+
+
+        workbook.close()
+        output.seek(0)
+        response.stream.write(output.read())
+        output.close()
 
     def get_xlsx_report_grouping(self, data, response):
         output = io.BytesIO()
