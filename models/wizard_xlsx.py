@@ -1,6 +1,7 @@
 import time
 import json
 import io
+import base64
 from datetime import date
 from odoo import fields, http, models, _
 from odoo.http import request
@@ -24,7 +25,7 @@ class AccountBankaStatement(models.Model):
             'data': {'model': 'example.xlsx.report.wizard',
                      'options': json.dumps(data, default=date_utils.json_default),
                      'output_format': 'xlsx',
-                     'report_name': 'Excel Report',
+                     'report_name': 'Relevé_de_caisse',
                     }
         }   
         
@@ -42,12 +43,18 @@ class ExcelWizard(models.TransientModel):
             'end_date': self.end_date,
             'get_model': self.get_model,
         }
+        if self.get_model and self.get_model == 'rel_caisse':
+            report_name="rel_caisse"
+        elif self.end_date:
+            report_name="Export Inscription "+str(self.start_date)+'_'+str(self.end_date)
+        else:
+            report_name="Export regroupement "+str(self.start_date)
         return {
             'type': 'ir_actions_xlsx_download',
             'data': {'model': 'example.xlsx.report.wizard',
                      'options': json.dumps(data, default=date_utils.json_default),
                      'output_format': 'xlsx',
-                     'report_name': 'Excel Report',
+                     'report_name': report_name or 'Report',
                     }
         }
     def get_xlsx_report(self, data, response):
@@ -64,18 +71,26 @@ class ExcelWizard(models.TransientModel):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
-        cell_format = workbook.add_format({'font_size': '12px'})
-        top_column_format = workbook.add_format({'font_size': '13px', 'bold':True})
+        cell_format = workbook.add_format({'font_size': '12px', 'border':True})
+        top_column_format = workbook.add_format({'font_size': '12px', 'bold':True,'border':True})
+        total_format = workbook.add_format({'font_size': '16px', 'bold':True,'border':True})
         head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
         txt = workbook.add_format({'font_size': '10px'})       
+
+        sheet.merge_range('A1:D4', '', head)
+
+        logo_image = io.BytesIO(base64.b64decode(self.env.company.logo))
+
+        sheet.insert_image('B1', "image.png", {'image_data': logo_image,'x_scale': 0.20,'y_scale':0.20})
         
+
         statement = self.env['account.bank.statement'].sudo().browse(int(data.get('statement_id')))
 
-        sheet.merge_range('A1:D2', "RELEVE DE CAISSE: "+statement.journal_id.name, head)
+        sheet.merge_range('A6:D7', "RELEVE DE CAISSE: "+statement.journal_id.name, head)
         column = XLSX_COLUMN
         top_column = ['Réference', 'Libellé', 'Débit', 'Crédit']
 
-        line = 5
+        line = 8
         count = 0
         for content in top_column:
             cell = column[count]+str(line)
@@ -103,34 +118,49 @@ class ExcelWizard(models.TransientModel):
                 count+=1
                 amount = abs(line_id.amount)
                 amount_debit += amount
+                cell = column[count]+str(line)
+                sheet.write(cell, amount, cell_format)
+                count+=1
+                cell = column[count]+str(line)
+                sheet.write(cell, '', cell_format)
             else:
-                count+=2
+                count += 1
+                cell = column[count]+str(line)
+                sheet.write(cell, '', cell_format)
+                count+=1
                 amount = line_id.amount
                 amount_credit += amount
-            cell = column[count]+str(line)
-            sheet.write(cell, amount, cell_format)
 
             line +=1
 
         # Total
         count = 0
         cell = column[count]+str(line)
-        sheet.write(cell, 'Total', top_column_format)
-        count +=2
-        cell = column[count]+str(line)
-        sheet.write(cell, amount_debit, top_column_format)
+        sheet.write(cell, 'Total', total_format)
         count +=1
         cell = column[count]+str(line)
-        sheet.write(cell, amount_credit, top_column_format)
+        sheet.write(cell, '', total_format)
+        count +=1
+        cell = column[count]+str(line)
+        sheet.write(cell, amount_debit, total_format)
+        count +=1
+        cell = column[count]+str(line)
+        sheet.write(cell, amount_credit, total_format)
 
         # Total Chèque + Bank
         line +=1
         count= 0
         cell = column[count]+str(line)
-        sheet.write(cell, '', top_column_format)
-        count += 3
+        sheet.write(cell, '', total_format)
+        count +=1
         cell = column[count]+str(line)
-        sheet.write(cell, abs(amount_debit - amount_credit), top_column_format)
+        sheet.write(cell, '', total_format)
+        count +=1
+        cell = column[count]+str(line)
+        sheet.write(cell, '', total_format)
+        count += 1
+        cell = column[count]+str(line)
+        sheet.write(cell, abs(amount_debit - amount_credit), total_format)
 
 
         workbook.close()
@@ -219,17 +249,24 @@ class ExcelWizard(models.TransientModel):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
-        cell_format = workbook.add_format({'font_size': '12px'})
-        top_column_format = workbook.add_format({'font_size': '13px', 'bold':True})
+        cell_format = workbook.add_format({'font_size': '12px', 'border':True})
+        top_column_format = workbook.add_format({'font_size': '13px', 'bold':True,'border': True})
         head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
         txt = workbook.add_format({'font_size': '10px'})
 
-        sheet.merge_range('A1:G2', "REPARTITION SALLE REGROUPEMENT: "+data['start_date'], head)
+        sheet.merge_range('A1:G4', '', head)
+
+        logo_image = io.BytesIO(base64.b64decode(self.env.company.logo))
+
+        sheet.insert_image('D1', "image.png", {'image_data': logo_image,'x_scale': 0.20,'y_scale':0.20})
+
+
+        sheet.merge_range('A6:G7', "REPARTITION SALLE REGROUPEMENT: "+data['start_date'], head)
         column = XLSX_COLUMN
         top_column = ['Code UE','Nom UE', 'Heure', 'Salle']
 
-        line = 5
-        count = 0
+        line = 8
+        count = 1
         for content in top_column:
             cell = column[count]+str(line)
             sheet.write(cell, content, top_column_format)
@@ -239,7 +276,7 @@ class ExcelWizard(models.TransientModel):
 
         grouping_ids = self.env['regrouping.center'].sudo().search([('date','=', data['start_date'])])
         for line_id in grouping_ids.mapped('regrouping_line_ids'):
-            count = 0
+            count = 1
 
             # Code UE
             cell = column[count]+str(line)
@@ -276,21 +313,25 @@ class ExcelWizard(models.TransientModel):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
-        cell_format = workbook.add_format({'font_size': '12px'})
-        top_column_format = workbook.add_format({'font_size': '13px', 'bold':True})
+        cell_format = workbook.add_format({'font_size': '12px', 'border': True})
+        top_column_format = workbook.add_format({'font_size': '12px', 'bold':True, 'border': True})
+        arrete_format = workbook.add_format({'font_size': '13px', 'bold':True})
         head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'20px'})
         txt = workbook.add_format({'font_size': '10px'})
 
-        # sheet.merge_range('B2:I3', 'EXCEL REPORT', head)
-        # sheet.write('B6', 'From:', cell_format)
+        sheet.merge_range('A1:K4', '', head)
 
-        sheet.merge_range('A1:I2', "INSCRIPTION ET REINSCRIPTION", head)
+        logo_image = io.BytesIO(base64.b64decode(self.env.company.logo))
+
+        sheet.insert_image('E1', "image.png", {'image_data': logo_image,'x_scale': 0.20,'y_scale':0.20})
+
+        sheet.merge_range('A5:K6', "INSCRIPTION ET REINSCRIPTION", head)
         column = XLSX_COLUMN
-        top_column = ['Auditeur', 'Civilité', 'Nom', 'Nom Marital', 'Prénom', 'Date de naissance', 'Mail', 'Diplôme','UE1','UE2','UE3','UE4','UE5','UE6','UE7','UE8']
+        top_column = ['Auditeur', 'Civilité', 'Nom', 'Nom Marital', 'Prénom', 'Date de naissance', 'Mail', 'Formation','UE1','UE2','UE3','UE4','UE5','UE6','UE7','UE8']
         
-        sheet.merge_range('A4:I4', 'Arrêtée le:'+str(date.today()), top_column_format)
+        sheet.merge_range('A8:K8', 'Arrêtée le:'+str(date.today()), top_column_format)
 
-        line = 5
+        line = 9
         count = 0
         for content in top_column:
             cell = column[count]+str(line)
@@ -351,12 +392,12 @@ class ExcelWizard(models.TransientModel):
             for ue in insc.units_enseignes:
                 count+=1
                 cell = column[count]+str(line)
-                sheet.write(cell, ue.name.display_name, cell_format)
+                sheet.write(cell, ue.name.code, cell_format)
             # Other UEs
             for ue in insc.other_ue_ids:
                 count+=1
                 cell = column[count]+str(line)
-                sheet.write(cell, ue.name.display_name, cell_format)
+                sheet.write(cell, ue.name.code, cell_format)
             line +=1
 
         workbook.close()
