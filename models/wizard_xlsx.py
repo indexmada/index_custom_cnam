@@ -119,7 +119,7 @@ class ExcelWizard(models.TransientModel):
                 amount = abs(line_id.amount)
                 amount_debit += amount
                 cell = column[count]+str(line)
-                sheet.write(cell, amount, cell_format)
+                sheet.write(cell, f'{amount:,}', cell_format)
                 count+=1
                 cell = column[count]+str(line)
                 sheet.write(cell, '', cell_format)
@@ -130,6 +130,8 @@ class ExcelWizard(models.TransientModel):
                 count+=1
                 amount = line_id.amount
                 amount_credit += amount
+                cell = column[count]+str(line)
+                sheet.write(cell, f'{amount:,}', cell_format)
 
             line +=1
 
@@ -142,10 +144,10 @@ class ExcelWizard(models.TransientModel):
         sheet.write(cell, '', total_format)
         count +=1
         cell = column[count]+str(line)
-        sheet.write(cell, amount_debit, total_format)
+        sheet.write(cell, f'{amount_debit:,}', total_format)
         count +=1
         cell = column[count]+str(line)
-        sheet.write(cell, amount_credit, total_format)
+        sheet.write(cell, f'{amount_credit:,}', total_format)
 
         # Total Chèque + Bank
         line +=1
@@ -160,7 +162,7 @@ class ExcelWizard(models.TransientModel):
         sheet.write(cell, '', total_format)
         count += 1
         cell = column[count]+str(line)
-        sheet.write(cell, abs(amount_debit - amount_credit), total_format)
+        sheet.write(cell, f'{abs(amount_debit - amount_credit):,}', total_format)
 
 
         workbook.close()
