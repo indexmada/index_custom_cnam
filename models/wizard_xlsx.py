@@ -377,7 +377,7 @@ class ExcelWizard(models.TransientModel):
 
         sheet.merge_range('A5:K6', "INSCRIPTION ET REINSCRIPTION", head)
         column = XLSX_COLUMN
-        top_column = ['Auditeur', 'Civilité', 'Nom', 'Nom Marital', 'Prénom', 'Date de naissance', 'Mail', 'Formation',
+        top_column = ['Auditeur', 'Civilité', 'Nom', 'Nom Marital', 'Prénom', 'Date de naissance', 'Mail', 'Diplôme',
         'UE1','UE2','UE3','UE4','UE5','UE6','UE7','UE8','UE9', 'UE10']
         
         sheet.merge_range('A8:K8', 'Arrêtée le:'+str(date.today()), top_column_format)
@@ -437,7 +437,7 @@ class ExcelWizard(models.TransientModel):
             # Diplôme
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, insc.foreign_diploma, cell_format)
+            sheet.write(cell, insc.formation_id.name, cell_format)
 
             # UEs
             for ue in insc.units_enseignes:
