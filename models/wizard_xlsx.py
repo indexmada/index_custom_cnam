@@ -92,6 +92,8 @@ class ExcelWizard(models.TransientModel):
 
         statement = self.env['account.bank.statement'].sudo().browse(int(data.get('statement_id')))
 
+        max_rep_stat = self.env['account.bank.statement'].sudo().search([('date', '<',statement.date), ('id', '!=', statement.id),('journal_id', '=', statement.journal_id.id)],order='date DESC',limit=1)
+
         sheet.merge_range('A6:D7', "JOURNAL DE: "+statement.journal_id.name, head)
         sheet.merge_range('A8:D8', "Date: "+str(statement.date), date_format)
         column = XLSX_COLUMN
@@ -107,6 +109,39 @@ class ExcelWizard(models.TransientModel):
         line +=1
         amount_debit = 0
         amount_credit = 0
+
+        if max_rep_stat:
+            count = 0
+
+            # Réference: Void
+            cell = column[count]+str(line)
+            sheet.write(cell, '', cell_format)
+
+            # Libellé
+            count +=1
+            cell = column[count]+str(line)
+            sheet.write(cell, 'Report du'+str(max_rep_stat.date), cell_format)
+
+            # Débit (Les montants Positifs) Crédit (Les montants Négatifs)
+            if max_rep_stat.balance_end_real >= 0:
+                count+=1
+                amount = abs(max_rep_stat.balance_end_real)
+                amount_debit += amount
+                cell = column[count]+str(line)
+                sheet.write(cell, f'{amount:,}', cell_format)
+                count+=1
+                cell = column[count]+str(line)
+                sheet.write(cell, '', cell_format)
+            else:
+                count += 1
+                cell = column[count]+str(line)
+                sheet.write(cell, '', cell_format)
+                count+=1
+                amount = abs(max_rep_stat.balance_end_real)
+                amount_credit += amount
+                cell = column[count]+str(line)
+                sheet.write(cell, f'{amount:,}', cell_format)
+            line +=1
 
         for line_id in statement.mapped('line_ids'):
             count = 0
