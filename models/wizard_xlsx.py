@@ -79,6 +79,7 @@ class ExcelWizard(models.TransientModel):
         cell_format = workbook.add_format({'font_size': '12px', 'border':True})
         top_column_format = workbook.add_format({'font_size': '12px', 'bold':True,'border':True})
         total_format = workbook.add_format({'font_size': '16px', 'bold':True,'border':True})
+        date_format = workbook.add_format({'font_size': '12px', 'bold':True,'align':'center'})
         head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
         txt = workbook.add_format({'font_size': '10px'})       
 
@@ -91,11 +92,12 @@ class ExcelWizard(models.TransientModel):
 
         statement = self.env['account.bank.statement'].sudo().browse(int(data.get('statement_id')))
 
-        sheet.merge_range('A6:D7', "RELEVE DE CAISSE: "+statement.journal_id.name, head)
+        sheet.merge_range('A6:D7', "JOURNAL DE: "+statement.journal_id.name, head)
+        sheet.merge_range('A8:D8', "Date: "+str(statement.date), date_format)
         column = XLSX_COLUMN
         top_column = ['Réference', 'Libellé', 'Débit', 'Crédit']
 
-        line = 8
+        line = 9
         count = 0
         for content in top_column:
             cell = column[count]+str(line)
@@ -118,8 +120,8 @@ class ExcelWizard(models.TransientModel):
             cell = column[count]+str(line)
             sheet.write(cell, line_id.name, cell_format)
 
-            # Débit (Les montants Négatif) Crédit (Les montants Positifs)
-            if line_id.amount < 0:
+            # Débit (Les montants Positifs) Crédit (Les montants Négatifs)
+            if line_id.amount >= 0:
                 count+=1
                 amount = abs(line_id.amount)
                 amount_debit += amount
@@ -133,7 +135,7 @@ class ExcelWizard(models.TransientModel):
                 cell = column[count]+str(line)
                 sheet.write(cell, '', cell_format)
                 count+=1
-                amount = line_id.amount
+                amount = abs(line_id.amount)
                 amount_credit += amount
                 cell = column[count]+str(line)
                 sheet.write(cell, f'{amount:,}', cell_format)
