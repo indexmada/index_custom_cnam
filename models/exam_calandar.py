@@ -213,6 +213,63 @@ class index_custom_cnam(models.Model):
     def there_is_overlap(self, nb1,nb2,ch3,ch4):
         return not((nb1 < ch3 and nb2 < ch3) or (nb1 > ch4 and nb2 > ch4))
 
+class NoteListFilter(models.Model):
+    _inherit = 'note.list.filter'
 
+    def action_generate_note(self):
+        inscription_ids = self.env['inscription.edu'].search([('state','in',('enf','accueil','account')),
+                                                                 ('school_year','=',self.year.id),
+                                                                 ])
+        
+        for unit_enseignes in inscription_ids.mapped('units_enseignes'):
+            if self.unit_enseigne.id == unit_enseignes.name.id and unit_enseignes.center_id.id in self.centre_ids.ids:
+                vals={
+                    'audit': unit_enseignes.inscription_id.name,
+                    'partner_id': unit_enseignes.inscription_id.student_id.id,
+                    'name': unit_enseignes.inscription_id.name_marital,
+                    'first_name': unit_enseignes.inscription_id.firstname,
+                    'date_of_birth': unit_enseignes.inscription_id.date_of_birth,
+                    'note_list_filter_id': self.id,
+                    'code': unit_enseignes.name.code,
+                    'intitule': unit_enseignes.display_name,
+                    'unit_enseigne': unit_enseignes.name.id,
+                    'centre_ids':[(4,center.id) for center in self.centre_ids],
+                    'tutor_id': self.tutor_id.id
+                    }
+                is_note_obj = self.env['note.list'].search([('audit','=',unit_enseignes.inscription_id.name),
+                                                            ('name','=',unit_enseignes.inscription_id.name_marital),
+                                                            ('first_name','=',unit_enseignes.inscription_id.firstname),
+                                                            ('date_of_birth','=',unit_enseignes.inscription_id.date_of_birth),
+                                                            ('note_list_filter_id','=', self.id)])
+                if not is_note_obj:
+                    self.env['note.list'].create(vals)
+
+        for unit_enseignes in inscription_ids.mapped('other_ue_ids'):
+            if self.unit_enseigne.id == unit_enseignes.name.id and unit_enseignes.center_id.id in self.centre_ids.ids:
+                vals={
+                    'audit': unit_enseignes.inscription_other_id.name,
+                    'partner_id': unit_enseignes.inscription_other_id.student_id.id,
+                    'name': unit_enseignes.inscription_other_id.name_marital,
+                    'first_name': unit_enseignes.inscription_other_id.firstname,
+                    'date_of_birth': unit_enseignes.inscription_other_id.date_of_birth,
+                    'note_list_filter_id': self.id,
+                    'code': unit_enseignes.name.code,
+                    'intitule': unit_enseignes.display_name,
+                    'unit_enseigne': unit_enseignes.name.id,
+                    'centre_ids':[(4,center.id) for center in self.centre_ids],
+                    'tutor_id': self.tutor_id.id
+                    }
+                is_note_obj = self.env['note.list'].search([('audit','=',unit_enseignes.inscription_other_id.name),
+                                                            ('name','=',unit_enseignes.inscription_other_id.name_marital),
+                                                            ('first_name','=',unit_enseignes.inscription_other_id.firstname),
+                                                            ('date_of_birth','=',unit_enseignes.inscription_other_id.date_of_birth),
+                                                            ('note_list_filter_id','=', self.id)])
+                if not is_note_obj:
+                    self.env['note.list'].create(vals)
                 
-    
+class NoteList(models.Model):
+    _inherit="note.list"
+
+    def get_note_by_student(self, partner_id):
+        notes = self.sudo().search([('partner_id', '=', partner_id), ('mention', '=', 'admis')])
+        return notes or False
