@@ -171,7 +171,48 @@ class ExcelWizard(models.TransientModel):
         cell = column[count]+str(line)
         sheet.write(cell, f'{abs(amount_debit - amount_credit):,}', total_format)
 
+        if statement.journal_id.type == 'cash':
+            # Billetage
+            count = 0
+            line +=3
+            cash_line_ids = statement.cashbox_end_id.cashbox_lines_ids
+            merge_cell = 'A'+str(line)+':D'+str(line+1)
+            sheet.merge_range(merge_cell, "BILLETAGE", head)
+            line +=2
+            top_column = ['','Nombre', 'Montant']
+            count = 0
+            for content in top_column:
+                cell = column[count]+str(line)
+                sheet.write(cell, content, top_column_format)
+                count +=1
+            for cash_line_id in cash_line_ids:
+                # Void
+                line +=1
+                count = 0
+                cell = column[count]+str(line)
+                sheet.write(cell, f'{cash_line_id.coin_value:,}', cell_format)
 
+                # Nombre
+                count += 1
+                cell = column[count]+str(line)
+                sheet.write(cell, str(cash_line_id.number), cell_format)                
+
+                # Amount
+                count += 1
+                cell = column[count]+str(line)
+                sheet.write(cell, f'{cash_line_id.subtotal:,}', cell_format)  
+
+            # Total Cash
+            line+=1
+            count = 0
+            cell = column[count]+str(line)
+            sheet.write(cell, 'Total', total_format)
+            count += 1
+            cell = column[count]+str(line)
+            sheet.write(cell, '', total_format)
+            count += 1
+            cell = column[count]+str(line)
+            sheet.write(cell, f'{statement.balance_end_real:,}', total_format) 
         workbook.close()
         output.seek(0)
         response.stream.write(output.read())
