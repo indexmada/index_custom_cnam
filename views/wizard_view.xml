@@ -101,6 +101,9 @@
             <xpath expr="//header" position="inside">
                 <button name="print_xlsx" string="Export Excel" type="object" class="oe_highlight"/>
             </xpath>
+            <xpath expr="//field[@name='ref']" position="replace">
+                <field name="ref" attrs="{'readonly' : [('journal_entry_ids', '!=', [])], 'invisible': 0 }" />
+            </xpath>
         </field>
     </record>
 </odoo>
