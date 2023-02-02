@@ -12,7 +12,12 @@ try:
 except ImportError:
     import xlsxwriter
 
-XLSX_COLUMN = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','R','S','T','U','V','W','X','Y','Z']
+XLSX_COLUMN = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+                'AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY','AZ',
+                'BA','BB','BC','BD','BE','BF','BG','BH','BI','BJ','BK','BL','BM','BN','BO','BP','BQ','BR','BS','BT','BU','BV','BW','BX','BY','BZ',
+                'CA','CB','CC','CD','CE','CF','CG','CH','CI','CJ','CK','CL','CM','CN','CO','CP','CQ','CR','CS','CT','CU','CV','CW','CX','CY','CZ',
+                'DA','DB','DC','DD','DE','DF','DG','DH','DI','DJ','DK','DL','DM','DN','DO','DP','DQ','DR','DS','DT','DU','DV','DW','DX','DY','DZ',
+                'EA','EB','EC','ED','EE','EF','EG','EH','EI','EJ','EK','EL','EM','EN','EO','EP','EQ','ER','ES','ET','EU','EV','EW','EX','EY','EZ']
 class AccountBankaStatement(models.Model):
     _inherit = "account.bank.statement"
 
@@ -329,7 +334,8 @@ class ExcelWizard(models.TransientModel):
 
         sheet.merge_range('A5:K6', "INSCRIPTION ET REINSCRIPTION", head)
         column = XLSX_COLUMN
-        top_column = ['Auditeur', 'Civilité', 'Nom', 'Nom Marital', 'Prénom', 'Date de naissance', 'Mail', 'Formation','UE1','UE2','UE3','UE4','UE5','UE6','UE7','UE8']
+        top_column = ['Auditeur', 'Civilité', 'Nom', 'Nom Marital', 'Prénom', 'Date de naissance', 'Mail', 'Formation',
+        'UE1','UE2','UE3','UE4','UE5','UE6','UE7','UE8','UE9', 'UE10']
         
         sheet.merge_range('A8:K8', 'Arrêtée le:'+str(date.today()), top_column_format)
 
