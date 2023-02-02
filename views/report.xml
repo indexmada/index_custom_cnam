@@ -124,12 +124,12 @@
                                 <div>
                                     Horaire: <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.start_time) * 60, 60))" /> à <span t-esc="'{0:02.0f}:{1:02.0f}'.format(*divmod(float(o.end_time) * 60, 60))" />
                                 </div>
-                                <div>
+                                <!-- <div>
                                     Centre d'examen: 
                                     <t t-foreach="o.center_ids" t-as="center">
                                         <t t-esc="center.name"/>, 
                                     </t>
-                                </div>
+                                </div> -->
 
                                 <br/><br/><br/>
                                 <h4>REPARTITION:</h4>
@@ -154,9 +154,6 @@
                                     </tbody>
                                 </table>
                                 <br/>
-                                <div class="text-center" style="page-break-after: always; margin-top: 20px;">
-                                    Le tuteur,
-                                </div>
                             </div>
                     </t>
                 </t>
@@ -551,6 +548,7 @@
                                         <td>Note /20</td>
                                     </tr>
                                     <tr>
+                                        <!-- <t t-set="unit_enseigne_ids" t-value=""/> -->
                                         <td><t t-esc="o.note_list_filter_id.unit_enseigne.code"/></td>
                                         <td><t t-esc="o.note_list_filter_id.unit_enseigne.display_name"/></td>
                                         <td t-if="o.mention == 'admis'" t-esc="o.note_sem2 or o.note_sem1"/>
