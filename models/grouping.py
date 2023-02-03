@@ -38,7 +38,7 @@ class RegroupingCenter(models.Model):
             ]
             ue_ids = ue_obj.search(domain_ue)
             ue_ids = ue_ids.filtered(
-                lambda ue: ue.inscription_id.state in STATE_UE_VALIDATE or ue.inscription_other_id in STATE_UE_VALIDATE)
+                lambda ue: ue.inscription_id.state in STATE_UE_VALIDATE or ue.inscription_other_id.state in STATE_UE_VALIDATE)
             inscription_ids = ue_ids.mapped("inscription_id") + ue_ids.mapped("inscription_other_id")
             students_ids = inscription_ids.mapped("student_id")
             rooms = self.get_avalaible_room(self.date ,line.begin_hours, line.end_hours, line.numbers_student)

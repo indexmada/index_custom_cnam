@@ -117,6 +117,8 @@ class index_custom_cnam(models.Model):
 
     def calculate(self):
         unit_enseignes_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account'))]).mapped('units_enseignes')
+        other_ues_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account'))]).mapped('other_ue_ids')
+        unit_enseignes_obj |= other_ues_obj
         exam_obj = self.env['exam.calandar'].search([('school_year','=',self.school_year.id),
                                                               ('session','=',self.session.id),
                                                               ('semester','=',self.semester.id),
@@ -130,22 +132,23 @@ class index_custom_cnam(models.Model):
             student_list = []
             student_list = self.get_existant_student(exam)
             for unit_enseignes in unit_enseignes_obj:
+                inscription_id = unit_enseignes.inscription_id or unit_enseignes.inscription_other_id
                 if unit_enseignes.name in exam.ue_ids and exam.centre_ue_id.id==unit_enseignes.center_id.id:
                     student=''
-                    if unit_enseignes.inscription_id.name_marital:
-                        student = unit_enseignes.inscription_id.name_marital
-                    if unit_enseignes.inscription_id.firstname:
-                        student = unit_enseignes.inscription_id.firstname
-                    if unit_enseignes.inscription_id.name_marital and unit_enseignes.inscription_id.firstname:
-                        student = unit_enseignes.inscription_id.name_marital+unit_enseignes.inscription_id.firstname
+                    if inscription_id.name_marital:
+                        student = inscription_id.name_marital
+                    if inscription_id.firstname:
+                        student = inscription_id.firstname
+                    if inscription_id.name_marital and inscription_id.firstname:
+                        student = inscription_id.name_marital+inscription_id.firstname
 
                     if student not in student_list:
                         room_available = self.get_avalaible_room(exam.date, exam.start_time, exam.end_time)
                         place_available = self.get_avalaible_place(room_available, exam.date, exam.start_time, exam.end_time)
-                        exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':unit_enseignes.inscription_id.name, 'student':student, 'room': room_available, 'table': place_available, 'inscription_id': unit_enseignes.inscription_id.id})]})
+                        exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':inscription_id.name, 'student':student, 'room': room_available, 'table': place_available, 'inscription_id': inscription_id.id})]})
                         student_list.append(student)
 
-                        convocation_student = self.env['convocation.list'].sudo().search([('school_year', '=', self.school_year.id), ('inscription_id', '=', unit_enseignes.inscription_id.id)], limit=1)
+                        convocation_student = self.env['convocation.list'].sudo().search([('school_year', '=', self.school_year.id), ('inscription_id', '=', inscription_id.id)], limit=1)
                         if convocation_student:
                             convocation_student.write({'line_ids': [(0, 0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
                                     'date':exam.date,'start_time':exam.start_time,
@@ -155,13 +158,13 @@ class index_custom_cnam(models.Model):
                             vals = {
                                 'date': self.create_date.date(),
                                 'student_id': student,
-                                'formation_id': unit_enseignes.inscription_id.formation_id.id,
-                                'auditor_number': unit_enseignes.inscription_id.name,
-                                'address_name': unit_enseignes.inscription_id.adress,
+                                'formation_id': inscription_id.formation_id.id,
+                                'auditor_number': inscription_id.name,
+                                'address_name': inscription_id.adress,
                                 'school_year': self.school_year.id,
                                 'exam_ids': [(4, exam.id)],
-                                'inscription_id': unit_enseignes.inscription_id.id,
-                                'reg_center_id': unit_enseignes.inscription_id.region_center_id.id,
+                                'inscription_id': inscription_id.id,
+                                'reg_center_id': inscription_id.region_center_id.id,
                                 'line_ids': [(0,0, {'code':exam.ue_code_string,'display_name':exam.ue_ids_string,
                                         'date':exam.date,'start_time':exam.start_time,
                                         'end_time':exam.end_time,'room':room_available,'table':place_available})]
