@@ -63,6 +63,16 @@ class index_custom_cnam(models.Model):
         for line in self:
             line.name = str(line.code_ue)+' '+str(line.school_year_id.name)
 
+    def _get_regrouping_line_by_ue(self, ue_config_id,school_year_id):
+        regrouping_lines = self.sudo().search([('ue_config_id', '=', int(ue_config_id)), ('school_year_id', '=', school_year_id)])
+        return regrouping_lines
+
+    def _get_grouping_date_dayofweek(self):
+        date = self.grouping_date
+        dayofweek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+        nb_jours = date.weekday()
+        return dayofweek[nb_jours]
+
 class RegroupingCentre(models.Model):
     _inherit = "regrouping.center"
 

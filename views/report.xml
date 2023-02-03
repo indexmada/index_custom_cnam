@@ -38,6 +38,53 @@
             </div>
         </template>
 
+        <template id="new_layout">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+
+            <div class="header">
+                <div class="row">
+                    <div class="col-4 mb4">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 100px;"
+                             alt="Logo"/>
+                    </div>
+                </div>
+            </div>
+            <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <t t-raw="0"/>
+            </div>
+            <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout" style="font-size:12px;">
+                <div class="text-center" style="border-top: 1px solid black;">
+                    <div>CENTRE CNAM MADAGASCAR</div>
+                    <div>Siège Social : <t t-esc="company.street"/> <t t-esc="company.street2"/></div>
+                    <ul class="list-inline mb4">
+                        <!-- using the list-inline-item class from bootstrap causes weird behaviours in pdf report
+                             adding d-inline class fixes the problem-->
+                        <li class="list-inline-item d-inline">Tel: <span class="o_force_ltr" t-field="company.phone"/></li>
+                        <li  class="list-inline-item d-inline">Email: <span t-field="company.email"/></li>
+                        <li  class="list-inline-item d-inline">Site Web: <span t-field="company.website"/></li>
+                    </ul>
+
+                    <div>
+                        Numéro de déclaration d'existence Au faritany Antananarivo : 1503-PA/ANT/SPA/ASS du 28/11/06
+                    </div>
+                </div>
+            </div>
+        </template>
+
         <template id="report_grouping">
             <t t-call="web.html_container">
                 <t t-call="web.internal_layout">
@@ -45,7 +92,7 @@
                         <t t-set="o" t-value="o.with_context(lang=lang)" />
                             <div class="page" style="font-family: 'arial';">
                                 <h2 class="text-center"> 
-                                    Regroupement:
+                                    Suivi de présence:
                                     <span t-esc="o.ue_config_id.name"/>
                                 </h2>
                                 <p class="row">
@@ -77,10 +124,12 @@
                                     <tbody>
                                         <t t-set="number_stud" t-value="1"/>
                                         <tr t-foreach="o.assignement_ids" t-as="assignement">
-                                            <td class="text-center"> <span t-esc="number_stud" /></td>
-                                            <td> <span t-field="assignement.student_id"/></td>
-                                            <td><span t-esc="assignement.room_id.name"/></td>
-                                            <t t-set="number_stud" t-value="number_stud+1"/>
+                                            <t t-if="assignement in o.student_pointed_ids">
+                                                <td class="text-center"> <span t-esc="number_stud" /></td>
+                                                <td> <span t-field="assignement.student_id"/></td>
+                                                <td><span t-esc="assignement.room_id.name"/></td>
+                                                <t t-set="number_stud" t-value="number_stud+1"/>
+                                            </t>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -99,7 +148,7 @@
     <report
             id="regrouping_by_ue_report"
             model="regrouping.center.line"
-            string="Regroupement"
+            string="Suivi de présence"
             report_type="qweb-pdf"
             name="index_custom_cnam.report_grouping"
             file="index_custom_cnam.report_grouping"
@@ -600,7 +649,92 @@
                 name="index_custom_cnam.att_re_report"
                 file="index_custom_cnam.att_re_report"
             />
-
-
+        <!-- Regroupement par UE dans unit.enseigne.config -->
+        <template id="ue_config_reg_report">
+            <t t-call="web.html_container">
+                <t t-call="index_custom_cnam.new_layout">
+                    <t t-set="ue_printed_id" t-value="[0]"/>
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="o" t-value="o.with_context(lang=lang)" />
+                        <t t-if="not company">
+                            <!-- Multicompany -->
+                            <t t-if="company_id">
+                                <t t-set="company" t-value="company_id"/>
+                            </t>
+                            <t t-elif="o and 'company_id' in o">
+                                <t t-set="company" t-value="o.company_id.sudo()"/>
+                            </t>
+                            <t t-else="else">
+                                <t t-set="company" t-value="res_company"/>
+                            </t>
+                        </t>
+                            <div t-if="o.ue_config_id and o.ue_config_id.id not in ue_printed_id" class="page" style="font-family: 'arial';">
+                                <t t-set="ue_regrouping_lines" t-value="o._get_regrouping_line_by_ue(o.ue_config_id.id, o.school_year_id.id)"/>
+                                <t t-set="ue_printed_temp" t-value="ue_printed_id.append(o.ue_config_id.id)"/>
+                                <h2><span>CALENDRIER DE REGROUPEMENT <t t-esc="o.school_year_id.name"/></span></h2>
+                                <h3><t t-esc="o.ue_config_id.code"/> : <t t-esc="o.ue_config_id.name"/></h3>
+                                <br/>
+                            
+                                <br/>
+                                <div>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>
+                                                <strong>JOUR</strong>
+                                            </th>
+                                            <th>
+                                                <strong>DATE</strong>
+                                            </th>
+                                            <th>
+                                                <strong>HORAIRE</strong>
+                                            </th>
+                                            <th>
+                                                <strong>TOTAL</strong>
+                                            </th>
+                                        </tr>
+                                        <t t-foreach="ue_regrouping_lines" t-as="reg">
+                                            <tr>
+                                                <td>
+                                                    <t t-esc="reg._get_grouping_date_dayofweek()"/>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="reg.grouping_date"/>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="'{0:02.0f}h{1:02.0f}'.format(*divmod(float(reg.begin_hours) * 60, 60))"/> - 
+                                                    <t t-esc="'{0:02.0f}h{1:02.0f}'.format(*divmod(float(reg.end_hours) * 60, 60))"/>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="'{0:02.0f}h{1:02.0f}'.format(*divmod(float(reg.duration) * 60, 60))"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <div class="offset-8  text-center">Fait à Antananarivo, le
+                                        <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y')"/>
+                                        <div>
+                                          <img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
+                                        </div>
+                                    <br/>
+                                    Le Directeur du centre<br/>
+                                    Jocelyn RASOANAIVO
+                                     </div>
+                                </div>
+                            </div>
+                            <p style="page-break-after:always"/>
+                    </t>  
+                </t>          
+            </t>
+        </template>
+        <report
+                id="ue_config_regrouping"
+                model="regrouping.center.line"
+                string="Calendrier de Regroupement"
+                report_type="qweb-pdf"
+                name="index_custom_cnam.ue_config_reg_report"
+                file="index_custom_cnam.ue_config_reg_report"
+            />
     </data>
 </odoo>
