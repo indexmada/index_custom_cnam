@@ -536,7 +536,7 @@
                                     </tr>
                                     <tr>
                                         <td/>
-                                        <td class="text-center"><img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/></td>
+                                        <td class="text-center"><img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/></td>
                                     </tr>
                                     <tr>
                                         <td/>
@@ -632,7 +632,7 @@
                                         <br/><br/>
                                         Pour l'Administratrice Générale et par délégation
                                         <div>
-                                          <img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
+                                          <img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
                                         </div>
                                     <br/>
                                     Le Directeur du centre<br/>
@@ -720,7 +720,7 @@
                                     <div class="offset-8  text-center">Fait à Antananarivo, le
                                         <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y')"/>
                                         <div>
-                                          <img t-if="company.sign_director" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
+                                          <img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
                                         </div>
                                     <br/>
                                     Le Directeur du centre<br/>
