@@ -119,16 +119,21 @@
                                             <th class="text-center font-weight-bold">Numéro</th>
                                             <th class="text-center font-weight-bold">Nom et prénom</th>
                                             <th class="text-center font-weight-bold">Salle</th>
+                                            <th class="text-center font-weight-bold">Présence</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <t t-set="number_stud" t-value="1"/>
                                         <tr t-foreach="o.assignement_ids" t-as="assignement">
-                                            <t t-if="assignement in o.student_pointed_ids">
                                                 <td class="text-center"> <span t-esc="number_stud" /></td>
                                                 <td> <span t-field="assignement.student_id"/></td>
                                                 <td><span t-esc="assignement.room_id.name"/></td>
                                                 <t t-set="number_stud" t-value="number_stud+1"/>
+                                            <t t-if="assignement in o.student_pointed_ids">
+                                                <td><i class="fa fa-check"/></td>
+                                            </t>
+                                            <t t-else="">
+                                                <td>-</td>
                                             </t>
                                         </tr>
                                     </tbody>
