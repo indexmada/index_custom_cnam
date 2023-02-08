@@ -1,24 +1,44 @@
 <odoo>
     <data>
-<!--
-        <template id="listing">
-          <ul>
-            <li t-foreach="objects" t-as="object">
-              <a t-attf-href="#{ root }/objects/#{ object.id }">
-                <t t-esc="object.display_name"/>
-              </a>
-            </li>
-          </ul>
-        </template>
-        <template id="object">
-          <h1><t t-esc="object.display_name"/></h1>
-          <dl>
-            <t t-foreach="object._fields" t-as="field">
-              <dt><t t-esc="field"/></dt>
-              <dd><t t-esc="object[field]"/></dd>
+    <template id="portal_cnam_documents" name="Mes Documents">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Mes Documents</t>
             </t>
-          </dl>
-        </template>
--->
+            <t t-if="not note_ids">
+                <p>Il n'y a pas de Documents pour ce compte.</p>
+            </t>
+
+            <t t-foreach="note_ids" t-as="note">
+                <t t-if="note" t-call="portal.portal_table">
+                    <div t-esc="note.note_list_filter_id.year.name"/>
+                    <thead>
+                        <tr class="active">
+                            <th>Année universitaire</th>
+                            <th>Documents</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span t-esc="note.note_list_filter_id.year.name"/>
+                            </td>
+                            <td>
+                              Attestation de réussite
+                            </td>
+                            <td>
+                                <a t-att-href="'/report/pdf/index_custom_cnam.att_re_report/%s' % note.id">
+                                    <button type="button" class="btn btn-primary btn-md o_website_form_send">Télécharger</button>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </t>
+              </t>
+            </t>
+    </template>
     </data>
 </odoo>

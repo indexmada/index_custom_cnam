@@ -577,7 +577,7 @@
                                 <t t-set="company" t-value="res_company"/>
                             </t>
                         </t>
-                        <t t-set="notes" t-value="env['note.list'].sudo().get_note_by_student(o.partner_id.id)"/>
+                        <t t-set="notes" t-value="env['note.list'].sudo().get_note_by_student(o.sudo().partner_id.id)"/>
                             <div t-if="notes" class="page" style="font-family: 'arial';">
                                 <h2 class="text-center"><strong>ATTESTATION DE REUSSITE</strong></h2>
                                 <br/>
