@@ -9,6 +9,9 @@ class ExamRepartition(models.Model):
     _inherit ="exam.repartition"
 
     inscription_id = fields.Many2one("inscription.edu", string="Inscription")
+    def get_exam_center(self):
+        for record in self:
+            record.center_ids = record.inscription_id.region_center_id
 
 class ConvocationList(models.Model):
     _inherit="convocation.list"
@@ -270,7 +273,64 @@ class NoteListFilter(models.Model):
                                                             ('note_list_filter_id','=', self.id)])
                 if not is_note_obj:
                     self.env['note.list'].create(vals)
-                
+
+    def action_generate_sec_session(self):
+        # Chef if the exam already has 2nd session générated
+        if (self.session.name.find('2') > 0):
+            print('*'*100)
+            print('This is already 2 session!')
+            return 0 
+        domain = [('year','=', self.year.id), ('unit_enseigne', '=', self.unit_enseigne.id), ('session.name', 'like', '2'), ('id', '!=', self.id)]
+        note_2_session = self.search(domain, limit=1).filtered(lambda n: n.centre_ids == self.centre_ids)
+        context = self._context.copy()
+        if note_2_session:
+            vals = {
+                'type': 'ir.actions.act_window',
+                'name': note_2_session.session.name,
+                'res_model': 'note.list.filter',
+                'views': [(self.env.ref('edu_management.view_note_list_filter_tree').id, 'tree'),
+                        (self.env.ref('edu_management.view_note_list_filter_form').id, 'form')],
+                'context': context,
+                'domain': [('id', 'in', note_2_session.ids)],
+                'target': 'current',
+            }
+        else:
+            session2 = self.env['sessions.edu'].sudo().search([('name', 'like', '2')], limit=1)
+            create_vals = {
+                'year': self.year.id,
+                'session': session2.id,
+                'centre_ids': self.centre_ids.ids,
+                'unit_enseigne':self.unit_enseigne.id,
+                'tutor_id':self.tutor_id.id,
+            }
+            new_rec = self.sudo().create(create_vals)
+            failed_notes = self.note_list_ids.filtered(lambda nl: nl.mention != 'admis')
+            for nt in failed_notes:
+                note_failed_vals={
+                    'audit': nt.audit,
+                    'partner_id': nt.partner_id.id,
+                    'name': nt.name,
+                    'first_name': nt.first_name,
+                    'date_of_birth': nt.date_of_birth,
+                    'code': nt.code,
+                    'intitule': nt.intitule,
+                    'unit_enseigne': nt.unit_enseigne.id,
+                    'centre_ids':nt.centre_ids,
+                    'tutor_id': nt.tutor_id.id
+                }
+                new_rec.write({'note_list_ids': [(0,0,note_failed_vals)]})
+            vals = {
+                'type': 'ir.actions.act_window',
+                'name': new_rec.session.name,
+                'res_model': 'note.list.filter',
+                'views': [(self.env.ref('edu_management.view_note_list_filter_tree').id, 'tree'),
+                        (self.env.ref('edu_management.view_note_list_filter_form').id, 'form')],
+                'context': context,
+                'domain': [('id', '=', new_rec.id)],
+                'target': 'current',
+            }
+        return vals
+
 class NoteList(models.Model):
     _inherit="note.list"
 
