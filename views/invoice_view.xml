@@ -13,6 +13,7 @@
                 <field name="name"/>
                 <field name="date"/>
                 <field name="amount"/>
+                <field name="cost_devise"/>
                 <field name="currency_id"/>
                 <field name="payment_state"/>
               </tree>
