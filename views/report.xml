@@ -513,13 +513,30 @@
 
                                 </div>
                                 <br/>
-                                <p>Nous susnommé(e)s et soussigné(e)s, co-responsables de l’engagement, nous engageons par la présente, quelque soit le taux de mon assiduité aux cours de l’Unité d’Enseignement auquel je me suis inscrit(e) au centre de formation CNAM<br/>Relative aux frais de formation, qui s’élève à  <strong><t t-esc="o.amount_total_ariary"/></strong> Ariary selon le calendrier ci-après:</p>
+                                <p>Nous susnommé(e)s et soussigné(e)s, co-responsables de l’engagement, nous engageons par la présente, quelque soit le taux de mon assiduité aux cours de l’Unité d’Enseignement auquel je me suis inscrit(e) au centre de formation CNAM<br/>Relative aux frais de formation, qui s’élève à  
+                                <strong>
+                                    <t t-if="o.amount_total_ariary">
+                                        <t t-esc="o.amount_total_ariary"/> Ariary
+                                    </t>
+                                    <t t-if="o.amount_total_ariary and o.amount_total_euro">
+                                        et
+                                    </t>
+                                    <t t-if="o.amount_total_euro">
+                                        <t t-esc="round(o.amount_total_euro, 1)"/> Euro
+                                    </t>
+                                    <t t-foreach="o.units_enseignes" t-as="ue">
+                                        <t t-esc="ue.name.code"/>
+                                    </t>
+                                    <t t-foreach="o.other_ue_ids" t-as="other_ue">
+                                        <t t-esc="other_ue.name.code"/>
+                                    </t>
+                                </strong> selon le calendrier ci-après:</p>
                                 <t t-set="count" t-value="1"/>
                                 <div t-foreach="o.payment_inscription_ids" t-as="pi_id">
-                                    <div style="display: inline-block" class="col-4" t-if="count == 1">1er Paiement: </div>
-                                    <div style="display: inline-block" class="col-4" t-else=""><t t-esc="count"/>eme Paiement: </div>
-                                    <div style="display: inline-block" class="col-4 offset-2 text-right">
-                                    Avant le <t t-esc="pi_id.date.strftime('%d-%m-%Y')"/> (<t t-esc="pi_id.name"/>)
+                                    <div style="display: inline-block" class="col-4" t-if="count == 1">1er Paiement: <strong t-esc="pi_id.cost_devise"/> <strong t-esc="pi_id.currency_id.name"/></div>
+                                    <div style="display: inline-block" class="col-4" t-else=""><t t-esc="count"/>eme Paiement: <strong t-esc="pi_id.cost_devise"/> <strong t-esc="pi_id.currency_id.name"/></div>
+                                    <div style="display: inline-block" class="col-6 text-right">
+                                    Avant le <strong t-esc="pi_id.date.strftime('%d-%m-%Y')"/> (<strong t-esc="pi_id.ref_rc"/>)
                                     </div>
                                     <t t-set="count" t-value="count+1"/>
                                 </div>

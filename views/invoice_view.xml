@@ -11,6 +11,7 @@
             <field name="payment_inscription_ids" widget="many2many">
               <tree editable="bottom">
                 <field name="name"/>
+                <field name="ref_rc"/>
                 <field name="date"/>
                 <field name="amount"/>
                 <field name="cost_devise"/>
