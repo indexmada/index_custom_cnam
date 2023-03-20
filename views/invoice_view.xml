@@ -57,6 +57,7 @@
       <field name="arch" type="xml">
         <field name="amount_residual_signed" position="replace">
           <field name="amount_residual"/>
+          <field name="journal_id"/>
         </field>
       </field>
     </record>
