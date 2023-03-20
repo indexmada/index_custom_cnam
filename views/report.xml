@@ -289,9 +289,9 @@
                                                 Lieu de l'examen
                                             </td>
                                             <td>
-                                                <t t-foreach="o.center_ids" t-as="center">
+                                                <!-- <t t-foreach="o.center_ids" t-as="center">
                                                     <span t-esc="center.name"/>, 
-                                                </t>
+                                                </t> -->
                                             </td>
                                         </tr>
                                         <tr>
@@ -438,7 +438,7 @@
                                     <tr>
                                         <td></td>
                                         <td>NOM ET PRENOMS</td>
-                                        <td>EMMARGEMENT</td>
+                                        <td>EMARGEMENT</td>
                                     </tr>
                                     <tr style="height: 50px;">
                                         <td rowspan="2">Surveillants</td>
