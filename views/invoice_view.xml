@@ -49,4 +49,15 @@
             </field>
         </record>
 
+<!-- Change the Amount due in the tree view to the ammount related to the currency of the invoice -->
+    <record id="view_invoice_tree_residual" model="ir.ui.view">
+      <field name="name">account.move.amount.due</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_invoice_tree"/>
+      <field name="arch" type="xml">
+        <field name="amount_residual_signed" position="replace">
+          <field name="amount_residual"/>
+        </field>
+      </field>
+    </record>
   </odoo>

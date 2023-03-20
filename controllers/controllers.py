@@ -19,23 +19,32 @@ class IndexCustomCnam(CustomerPortal):
     #     return "all cost updated"
 
 
-    @http.route('/index_custom_cnam/update_payment_term', auth='public')
-    def update_payment_term(self, **kw):
-        invoice_ids = http.request.env['account.move'].sudo().search([])
-        for invoice_id in invoice_ids:
-            max_date = ''
-            for pi in invoice_id.payment_inscription_ids:
-                if not max_date:
-                    max_date = pi.date
-                if pi.date > max_date:
-                    max_date = pi.date
-            if max_date:
-                invoice_id.write({
-                    'invoice_payment_term_id': None,
-                    'invoice_date_due': max_date
-                })
+    # @http.route('/index_custom_cnam/update_payment_term', auth='public')
+    # def update_payment_term(self, **kw):
+    #     invoice_ids = http.request.env['account.move'].sudo().search([])
+    #     for invoice_id in invoice_ids:
+    #         max_date = ''
+    #         for pi in invoice_id.payment_inscription_ids:
+    #             if not max_date:
+    #                 max_date = pi.date
+    #             if pi.date > max_date:
+    #                 max_date = pi.date
+    #         if max_date:
+    #             invoice_id.write({
+    #                 'invoice_payment_term_id': None,
+    #                 'invoice_date_due': max_date
+    #             })
 
-        return "Dates updated"
+    #     return "Dates updated"
+
+    @http.route('/index_custom_cnam/update_regrouping_date', auth='public')
+    def update_regrouping_date(self, **kw):
+        line_ids = request.env['regrouping.center.line'].sudo().search([('grouping_date','=', None)])
+        for line in line_ids:
+            if line.regrouping_id and line.regrouping_id.date:
+                line.write({'grouping_date': line.regrouping_id.date})
+
+        return "Thanks! All date updated."
 
     @http.route(['/my/cnam_documents'], type='http', auth="user", website=True)
     def portal_cnam_documents(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
