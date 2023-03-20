@@ -381,11 +381,8 @@
                                 <t t-set="company" t-value="res_company"/>
                             </t>
                         </t>
-                        <t t-set="rooms" t-value="o.exam_repartition_ids.mapped('room')"/>
-                        <t t-set="last_room" t-value="lr"/>
-                        <t t-foreach="rooms" t-as="room">
-                            <div class="page" t-if="not last_room == room" style="font-family: 'arial';">
-                                <t t-set="last_room" t-value="room"/>
+                        <t t-foreach="o" t-as="room">
+                            <div class="page" style="font-family: 'arial';">
                                 <h2 class="text-center">
                                     PROCES-VERBAL DU DEROULEMENT DES EPREUVES
                                 </h2>
@@ -393,15 +390,15 @@
                                 <div>
                                     <span>
                                         CENTRE D'EXAMEN: <strong>
-                                            <t t-foreach="o.center_ids" t-as="center">
+                                            <!-- <t t-foreach="o.center_ids" t-as="center">
                                                 <t t-esc="center.name"/>, 
-                                            </t>
+                                            </t> -->
                                         </strong>
                                     </span>
                                 </div>
                                 <div>
                                     <span>
-                                        SALLE D'EXAMEN: <strong><t t-esc="room"/></strong>
+                                        SALLE D'EXAMEN: <!-- <strong><t t-esc="room"/></strong> -->
                                     </span>
                                 </div>
                                 <div>
