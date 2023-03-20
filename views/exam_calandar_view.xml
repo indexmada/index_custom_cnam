@@ -32,4 +32,15 @@
         name="Configuration Calendrier"
         action="calandar_config"
         parent="edu_management.menu_edu_configuration" sequence="8" />
+
+    <record id="exam_rep_new" model="ir.ui.view">
+        <field name="name">exam.repartition.add.field.insc</field>
+        <field name="model">exam.repartition</field>
+        <field name="inherit_id" ref="edu_management.view_exam_repartition_tree"/>
+        <field name="arch" type="xml">
+            <field name="student" position="replace">
+                <field name="inscription_id_name_formated"/>
+            </field>
+        </field>
+    </record>
 </odoo>
