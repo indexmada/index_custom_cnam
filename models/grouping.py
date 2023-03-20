@@ -16,6 +16,12 @@ STATE_ROOM = [
 class RegroupingCenter(models.Model):
     _inherit = 'regrouping.center'
 
+    @api.onchange('date')
+    def date_change(self):
+        for rec in self:
+            for line in rec.regrouping_line_ids:
+                line.grouping_date = rec.date
+
     def action_distribution_student(self):
         """Action to distribution """
         self.write({'button_state': 'send'})

@@ -17,19 +17,22 @@ class index_custom_cnam(models.Model):
 
     name = fields.Char("Nom", compute="compute_line_name")
 
+    def _set_default_grouping_date(self):
+        return self.regrouping_id.date
+
     begin_hours = fields.Float("Heure de début", required=True)
     end_hours = fields.Float("Heure de Fin", required=True)
 
     begin_date_time = fields.Datetime("Date et Heure de début", compute='_compute_begin_date_time')
     end_date_time = fields.Datetime("Date et Heure de fin", compute='_compute_end_date_time')
     school_year_id = fields.Many2one("school.year", "Année Universitaire", required=True,compute='compute_school_year')
-    grouping_date = fields.Date("Date du regroupement", store=False, compute="_get_grouping_date")
+    grouping_date = fields.Date("Date du regroupement", store=True, default=_set_default_grouping_date)
 
     student_pointed_ids = fields.Many2many("assignment.student", "regrouping_line_id", string="Pointage", domain="[('id', 'in', assignement_ids)]")
 
-    def _get_grouping_date(self):
-        for record in self:
-            record.grouping_date = record.regrouping_id.date
+    # def _get_grouping_date(self):
+    #     for record in self:
+    #         record.grouping_date = record.regrouping_id.date
 
     def compute_school_year(self):
         for line in self:
@@ -64,7 +67,7 @@ class index_custom_cnam(models.Model):
             line.name = str(line.code_ue)+' '+str(line.school_year_id.name)
 
     def _get_regrouping_line_by_ue(self, ue_config_id,school_year_id):
-        regrouping_lines = self.sudo().search([('ue_config_id', '=', int(ue_config_id)), ('school_year_id', '=', school_year_id)])
+        regrouping_lines = self.sudo().search([('ue_config_id', '=', int(ue_config_id)), ('school_year_id', '=', school_year_id)], order="grouping_date ASC")
         return regrouping_lines
 
     def _get_grouping_date_dayofweek(self):

@@ -724,6 +724,7 @@
                                                 <strong>TOTAL</strong>
                                             </th>
                                         </tr>
+                                        <t t-set="total_duration" t-value="0"/>
                                         <t t-foreach="ue_regrouping_lines" t-as="reg">
                                             <tr>
                                                 <td>
@@ -738,12 +739,19 @@
                                                 </td>
                                                 <td>
                                                     <t t-esc="'{0:02.0f}h{1:02.0f}'.format(*divmod(float(reg.duration) * 60, 60))"/>
+                                                    <t t-set="total_duration" t-value="total_duration + reg.duration"/>
                                                 </td>
                                             </tr>
                                         </t>
+                                        <tr>
+                                            <td>TOTAL</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><t t-esc="'{0:02.0f}h{1:02.0f}'.format(*divmod(float(total_duration) * 60, 60))"/></td>
+                                        </tr>
                                     </table>
                                 </div>
-                                <div class="row">
+                                <!-- <div class="row">
                                     <div class="offset-8  text-center">Fait à Antananarivo, le
                                         <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y')"/>
                                         <div>
@@ -753,7 +761,7 @@
                                     Le Directeur du centre<br/>
                                     Jocelyn RASOANAIVO
                                      </div>
-                                </div>
+                                </div> -->
                             </div>
                             <p style="page-break-after:always"/>
                     </t>  

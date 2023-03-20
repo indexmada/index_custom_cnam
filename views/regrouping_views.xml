@@ -16,6 +16,7 @@
         	</xpath>
             <xpath expr="//field[@name='regrouping_line_ids']/tree/field[@name='assignement_ids']" position="after">
                 <field name="student_pointed_ids" widget="many2many_tags"/>
+                <field name="grouping_date" invisible="1"/>
             </xpath>
         </field>
 	</record>
@@ -61,6 +62,7 @@
                 <field name="end_hours" widget="float_time"/>
                 <field name="examen_rooms" widget="many2many_tags"/>
                 <field name="assignement_ids" widget="many2many_tags"/>
+                <field name="regrouping_id" invisible="1"/>
             </tree>
         </field>
     </record>
