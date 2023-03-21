@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-
+from datetime import date
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -19,6 +19,8 @@ class AccountMove(models.Model):
                     max_date = payment.date
             if max_date:
                 record.invoice_date_due = max_date
+            else:
+                record.invoice_date_due = date.today()
 
     payment_inscription_ids = fields.One2many('payment.inscription', "inscription_id", compute="get_payment_inscription_ids", store=False)
     remain_to_pay_ariary = fields.Float("Reste à payer en Ariary", related='inscription_id.remain_to_pay_ariary')
