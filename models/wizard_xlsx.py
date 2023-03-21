@@ -97,7 +97,7 @@ class ExcelWizard(models.TransientModel):
         sheet.merge_range('A6:D7', "JOURNAL DE: "+statement.journal_id.name, head)
         sheet.merge_range('A8:D8', "Date: "+str(statement.date), date_format)
         column = XLSX_COLUMN
-        top_column = ['Réference', 'Libellé', 'Débit', 'Crédit']
+        top_column = ['Réference', 'Libellé','Partenaire', 'Débit', 'Crédit']
 
         line = 9
         count = 0
@@ -121,6 +121,11 @@ class ExcelWizard(models.TransientModel):
             count +=1
             cell = column[count]+str(line)
             sheet.write(cell, 'Report du'+str(max_rep_stat.date), cell_format)
+
+            # Partenaire
+            count +=1
+            cell = column[count]+str(line)
+            sheet.write(cell, '', cell_format)
 
             # Débit (Les montants Positifs) Crédit (Les montants Négatifs)
             if max_rep_stat.balance_end_real >= 0:
@@ -154,6 +159,15 @@ class ExcelWizard(models.TransientModel):
             count +=1
             cell = column[count]+str(line)
             sheet.write(cell, line_id.name, cell_format)
+
+            # Partenaire
+            count +=1
+            cell = column[count]+str(line)
+            if line_id.partner_id:
+                partner_name = line_id.partner_id.name
+            else:
+                partner_name = ''
+            sheet.write(cell, partner_name, cell_format)
 
             # Débit (Les montants Positifs) Crédit (Les montants Négatifs)
             if line_id.amount >= 0:
