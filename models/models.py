@@ -33,6 +33,10 @@ class index_custom_cnam(models.Model):
     # def _get_grouping_date(self):
     #     for record in self:
     #         record.grouping_date = record.regrouping_id.date
+    @api.onchange('code_ue','assignement_ids','duration')
+    def _set_d_grouping_date(self):
+        for record in self:
+            record.grouping_date = record.regrouping_id.date
 
     def compute_school_year(self):
         for line in self:
