@@ -490,8 +490,10 @@ class ExcelWizard(models.TransientModel):
             # Nom marital
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, insc.name_marital, cell_format)
-
+            if insc.name_marital:
+                sheet.write(cell, insc.name_marital, cell_format)
+            else:
+                sheet.write(cell, '', cell_format)
             # Prénom
             count+=1
             cell = column[count]+str(line)
