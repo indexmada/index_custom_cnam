@@ -89,7 +89,8 @@ class IndexCustomCnam(CustomerPortal):
                 attestation_ok.append(vals_att)
                 group_att |= note
 
-
+        portal_attachs = request.env['ir.attachment'].sudo().search([('res_model', '=', 'res.partner'), ('res_id', '=', request.env.user.partner_id.id)])
+        inscri_attachs = request.env['ir.attachment'].sudo().search([('res_model', '=', 'inscription.edu'), ('res_id', '=', request.env.user.partner_id.inscription_id.id)])
         values.update({
             'date': date_begin,
             'note_ids': group_att,
@@ -99,5 +100,7 @@ class IndexCustomCnam(CustomerPortal):
             'default_url': '/my/note',
             'sortby': sortby,
             'searchbar_filters': OrderedDict(sorted(searchbar_filters.items())),
+            'portal_attachs': portal_attachs,
+            'inscri_attachs': inscri_attachs
         })
         return request.render("index_custom_cnam.portal_cnam_documents", values)

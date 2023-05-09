@@ -11,17 +11,17 @@
                 <p>Il n'y a pas de Documents pour ce compte.</p>
             </t>
 
-            <t t-foreach="note_ids" t-as="note">
-                <t t-if="note" t-call="portal.portal_table">
-                    <div t-esc="note.note_list_filter_id.year.name"/>
-                    <thead>
-                        <tr class="active">
-                            <th>Année universitaire</th>
-                            <th>Documents</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <t t-if="note_ids" t-call="portal.portal_table">
+                <div><strong>Attestation de réussite</strong></div>
+                <thead>
+                    <tr class="active">
+                        <th>Année universitaire</th>
+                        <th>Documents</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="note_ids" t-as="note">
                         <tr>
                             <td>
                                 <span t-esc="note.note_list_filter_id.year.name"/>
@@ -35,8 +35,64 @@
                                 </a>
                             </td>
                         </tr>
-                    </tbody>
-                </t>
+                    </t>
+                </tbody>
+            </t>
+              <t t-if="portal_attachs" t-call="portal.portal_table">
+                <br/><br/>
+                <div><strong>Pièces Jointes</strong> (Etudiant)</div>
+                <thead>
+                    <tr class="active">
+                        <th>Date</th>
+                        <th>Documents</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="portal_attachs" t-as="att">
+                        <tr>
+                            <td>
+                                <span t-esc="att.create_date"/>
+                            </td>
+                            <td>
+                                <span t-esc="att.name"/>
+                            </td>
+                            <td>
+                                <a t-att-href="'/web/content/'+str(att.id)+'?download=true'">
+                                    <button type="button" class="btn btn-primary btn-md o_website_form_send">Télécharger</button>
+                                </a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+              </t>
+              <t t-if="inscri_attachs" t-call="portal.portal_table">
+                <br/><br/>
+                <div><strong>Pièces Jointes</strong> (Insription)</div>
+                <thead>
+                    <tr class="active">
+                        <th>Date</th>
+                        <th>Documents</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="inscri_attachs" t-as="att">
+                        <tr>
+                            <td>
+                                <span t-esc="att.create_date"/>
+                            </td>
+                            <td>
+                                <span t-esc="att.name"/>
+                            </td>
+                            <td>
+                                <a t-att-href="'/web/content/'+str(att.id)+'?download=true'">
+                                    <button type="button" class="btn btn-primary btn-md o_website_form_send">Télécharger</button>
+                                </a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
               </t>
             </t>
     </template>
