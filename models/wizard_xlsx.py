@@ -40,6 +40,7 @@ class ExcelWizard(models.TransientModel):
     start_date = fields.Date(string="Start Date", default=date.today(), required=True)
     end_date = fields.Date(string="End Date", default=date.today(), required=False)
     get_model = fields.Char(string="Model", required=False)
+    semester_ids = fields.Many2many(string="Semestres", required=False, comodel_name="semestre.edu")
     def print_xlsx(self):
         if self.end_date and self.start_date > self.end_date:
             raise ValidationError('Start Date must be less than End Date')
@@ -51,6 +52,16 @@ class ExcelWizard(models.TransientModel):
         if self.get_model and self.get_model == 'rel_caisse':
             report_name="rel_caisse"
         elif self.end_date:
+            if self.semester_ids:
+                tab = False
+                for s in self.semester_ids:
+                    if not tab:
+                        tab = str(s.id)
+                    else:
+                        tab = tab +'_'+ str(s.id)
+                data['semester_ids'] = str(tab)
+            else:
+                data['semester_ids'] = 0
             report_name="Export Inscription "+str(self.start_date)+'_'+str(self.end_date)
         else:
             report_name="Export regroupement "+str(self.start_date)
@@ -439,10 +450,23 @@ class ExcelWizard(models.TransientModel):
             count +=1
 
         line +=1
-        inscription_ids = self.env['inscription.edu'].sudo().search([('date', '>=', data['start_date']), ('date','<=', data['end_date'])])
+        insc_domain = [('date', '>=', data['start_date']), ('date','<=', data['end_date'])]
+        inscription_ids = self.env['inscription.edu'].sudo().search(insc_domain)
+            
         for insc in inscription_ids:
-            count = 0
+            semester_insc = insc.get_semester_insc()
+            semester_found = False
+            if data['semester_ids'] and data['semester_ids'] != 0:
+                sem_ids = data['semester_ids'].split('_')
+                for sem in semester_insc:
+                    if str(sem.id) in sem_ids:
+                        semester_found = True
+                        break;
 
+                if not semester_found:
+                    continue
+
+            count = 0
             # Auditeur
             cell = column[count]+str(line)
             sheet.write(cell, insc.name, cell_format) 

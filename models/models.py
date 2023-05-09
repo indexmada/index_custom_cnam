@@ -196,6 +196,16 @@ class UnitEnseignementConfig(models.Model):
 class InscriptionEducation(models.Model):
     _inherit="inscription.edu"
 
+    def get_semester_insc(self):
+            semester_ids = self.env['semestre.edu'].sudo()
+            for ue in self.units_enseignes:
+                if ue.semestre_id:
+                    semester_ids |= ue.semestre_id
+            for other in self.other_ue_ids:
+                if other.semestre_id:
+                    semester_ids |= other.semestre_id
+            return semester_ids
+
     @api.depends("surname", "name_marital", "firstname")
     def compute_display_name(self):
         for insc in self:
