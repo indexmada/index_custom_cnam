@@ -480,12 +480,12 @@ class ExcelWizard(models.TransientModel):
                 civilite = 'Madame'
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, civilite, cell_format)
+            sheet.write(cell, civilite or '', cell_format)
 
             # Nom
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, insc.surname, cell_format)
+            sheet.write(cell, insc.surname or '', cell_format)
 
             # Nom marital
             count+=1
@@ -497,33 +497,36 @@ class ExcelWizard(models.TransientModel):
             # Prénom
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, insc.firstname, cell_format)
+            sheet.write(cell, insc.firstname or '', cell_format)
 
             # Date de naissance
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, str(insc.date_of_birth), cell_format)
+            if insc.date_of_birth:
+                sheet.write(cell, str(insc.date_of_birth), cell_format)
+            else:
+                sheet.write(cell, '', cell_format)
 
             # Mail
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, insc.email, cell_format)
+            sheet.write(cell, insc.email or '', cell_format)
 
             # Diplôme
             count+=1
             cell = column[count]+str(line)
-            sheet.write(cell, insc.formation_id.name, cell_format)
+            sheet.write(cell, insc.formation_id.name or '', cell_format)
 
             # UEs
             for ue in insc.units_enseignes:
                 count+=1
                 cell = column[count]+str(line)
-                sheet.write(cell, ue.name.code, cell_format)
+                sheet.write(cell, ue.name.code or '', cell_format)
             # Other UEs
             for ue in insc.other_ue_ids:
                 count+=1
                 cell = column[count]+str(line)
-                sheet.write(cell, ue.name.code, cell_format)
+                sheet.write(cell, ue.name.code or '', cell_format)
             line +=1
 
         workbook.close()
