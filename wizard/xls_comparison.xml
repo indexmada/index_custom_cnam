@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="xls_comparison_form" model="ir.ui.view">
+        <field name="name">Tableau de comparaison</field>
+        <field name="model">xls.comparison</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="school_year"/>
+                </group>
+                <group>
+                    <field name="semester_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="generate_report" type="object" string="Exporter" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <act_window id="xls_comparison_action" name="Comparaison Inscription" res_model="xls.comparison" view_mode="form"
+                target="new"/>
+
+    <menuitem id="xls_comparison_menu"
+              name="Suivi &amp; Comparaison "
+              parent="edu_management.menu_schooling"
+              sequence="2"
+              action="xls_comparison_action"/>
+
+</odoo>

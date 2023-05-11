@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
         'views/regrouping_views.xml',
@@ -35,7 +35,8 @@
         'views/cron.xml',
         'views/sale_analysis.xml',
         'views/action_manager.xml',
-        'views/wizard_view.xml'
+        'views/wizard_view.xml',
+        'wizard/xls_comparison.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
