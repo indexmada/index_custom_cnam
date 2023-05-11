@@ -103,7 +103,7 @@ class xlsComparisonController(http.Controller):
                 row +=1
                 if len(school_year_ids)>0:
                     cell = 'C'+str(row)+':E'+str(row)
-                    worksheet_ost.merge_range(cell, school_year_ids[0].name, cell_bold_center_11)
+                    worksheet_ost.merge_range(cell, str(school_year_ids[0][0])+'-'+str(school_year_ids[0][1]), cell_bold_center_11)
 
                     cell = 'C'+str(row+1)
                     worksheet_ost.write(cell, 'REINS', cell_center_11)
@@ -114,7 +114,7 @@ class xlsComparisonController(http.Controller):
 
                 if len(school_year_ids)>1:
                     cell = 'F'+str(row)+':H'+str(row)
-                    worksheet_ost.merge_range(cell, school_year_ids[1].name, cell_bold_center_11)
+                    worksheet_ost.merge_range(cell, str(school_year_ids[1][0])+'-'+str(school_year_ids[1][1]), cell_bold_center_11)
 
                     cell = 'F'+str(row+1)
                     worksheet_ost.write(cell, 'REINS', cell_center_11)
@@ -125,7 +125,7 @@ class xlsComparisonController(http.Controller):
 
                 if len(school_year_ids)>2:
                     cell = 'I'+str(row)+':K'+str(row)
-                    worksheet_ost.merge_range(cell, school_year_ids[2].name, cell_bold_center_11)
+                    worksheet_ost.merge_range(cell, str(school_year_ids[2][0])+'-'+str(school_year_ids[2][1]), cell_bold_center_11)
 
                     cell = 'I'+str(row+1)
                     worksheet_ost.write(cell, 'REINS', cell_center_11)
@@ -145,8 +145,9 @@ class xlsComparisonController(http.Controller):
         col = ['C', 'F', 'I']
         col_nvx = ['D', 'G', 'J']
         col_ue = ['E', 'H', 'K']
+
         for year_id in year_ids:
-            year_tab = year_id.name.split('-')
+            year_tab = year_id
             month_tab_1 = [7,8,9,10,11,12]
             month_tab_2 = [1,2,3,4,5,6]
             r = row
@@ -278,8 +279,9 @@ class xlsComparisonController(http.Controller):
         year2 = int(year_tab[1]) -1
         year3 = year1 -1
         year4 = year2 -1
-        school_ids = request.env['school.year'].sudo().search([('name','like', year3), ('name', 'like', year4)])
-        school_ids |= request.env['school.year'].sudo().search([('name','like', year1), ('name', 'like', year2)])
-        school_ids |= year_id
+        # school_ids = request.env['school.year'].sudo().search([('name','like', year3), ('name', 'like', year4)])
+        # school_ids |= request.env['school.year'].sudo().search([('name','like', year1), ('name', 'like', year2)])
+        # school_ids |= year_id
+        school_ids = [(year3, year4), (year1, year2), (year_tab[0], year_tab[1])]
         return school_ids
 
