@@ -15,7 +15,7 @@ class xlsComparisonController(http.Controller):
 
     @http.route('/web/binary/download_comparison_xls_file', type='http', auth="public")
     def download_comparison_xls_file(self, school_year, semestres=''):  #
-        filename = "Suivi-Inscription_COMPARATIVE.xlsx"
+        filename = "Liste_comparative.xlsx"
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output)
 

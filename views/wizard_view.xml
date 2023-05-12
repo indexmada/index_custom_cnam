@@ -14,9 +14,9 @@
                     <field name="semester_ids" widget="many2many_tags"/>
                 </group>
                 <footer>
-                    <button name="print_xlsx" string="PRINT" type="object"
+                    <button name="print_xlsx" string="Exporter" type="object"
                              default_focus="1" class="oe_highlight"/>
-                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    <button string="Annuler" class="btn btn-default" special="cancel"/>
                 </footer>
             </form>
         </field>
@@ -44,9 +44,9 @@
                     <field name="end_date" invisible="1"/>
                 </group>
                 <footer>
-                    <button name="print_xlsx" string="PRINT" type="object"
+                    <button name="print_xlsx" string="Exporter" type="object"
                              default_focus="1" class="oe_highlight"/>
-                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    <button string="Annuler" class="btn btn-default" special="cancel"/>
                 </footer>
             </form>
         </field>
@@ -76,9 +76,9 @@
                     <field name="get_model" invisible="1"/>
                 </group>
                 <footer>
-                    <button name="print_xlsx" string="PRINT" type="object"
+                    <button name="print_xlsx" string="Exporter" type="object"
                              default_focus="1" class="oe_highlight"/>
-                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    <button string="Annuler" class="btn btn-default" special="cancel"/>
                 </footer>
             </form>
         </field>
