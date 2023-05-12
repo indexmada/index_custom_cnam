@@ -22,16 +22,15 @@ class AccountBankaStatement(models.Model):
     _inherit = "account.bank.statement"
 
     def print_xlsx(self):
-        data = {
-            'statement_id': self.id,
-        }
+        report_name = "Relevé_de_caisse.xlsx"
         return {
-            'type': 'ir_actions_xlsx_download',
-            'data': {'model': 'example.xlsx.report.wizard',
-                     'options': json.dumps(data, default=date_utils.json_default),
-                     'output_format': 'xlsx',
-                     'report_name': 'Relevé_de_caisse',
-                    }
+            'type': 'ir.actions.act_url',
+            'target': 'current',
+            'url': '/xlsx_reports?filename='
+                   + (report_name or "")+'&statement_id='+str(self.id)
+
+
+        
         }   
         
 
@@ -44,13 +43,9 @@ class ExcelWizard(models.TransientModel):
     def print_xlsx(self):
         if self.end_date and self.start_date > self.end_date:
             raise ValidationError('Start Date must be less than End Date')
-        data = {
-            'start_date': self.start_date,
-            'end_date': self.end_date,
-            'get_model': self.get_model,
-        }
+        tab = ''
         if self.get_model and self.get_model == 'rel_caisse':
-            report_name="rel_caisse"
+            report_name="rel_caisse.xlsx"
         elif self.end_date:
             if self.semester_ids:
                 tab = False
@@ -59,34 +54,37 @@ class ExcelWizard(models.TransientModel):
                         tab = str(s.id)
                     else:
                         tab = tab +'_'+ str(s.id)
-                data['semester_ids'] = str(tab)
-            else:
-                data['semester_ids'] = 0
-            report_name="Export Inscription "+str(self.start_date)+'_'+str(self.end_date)
+            report_name="Export Inscription "+(str(self.start_date) or '')+"_"+(str(self.end_date) or '')+".xlsx"
         else:
-            report_name="Export regroupement "+str(self.start_date)
+            report_name="Export regroupement "+(str(self.start_date)or '')+".xlsx"
         return {
-            'type': 'ir_actions_xlsx_download',
-            'data': {'model': 'example.xlsx.report.wizard',
-                     'options': json.dumps(data, default=date_utils.json_default),
-                     'output_format': 'xlsx',
-                     'report_name': report_name or 'Report',
-                    }
-        }
-    def get_xlsx_report(self, data, response):
-        if data.get('statement_id'):
-            self.get_xlsx_report_caisse_by_statement(data, response)
-        elif data.get('get_model') and data['get_model'] == 'rel_caisse':
-            self.get_xlsx_report_rel_caisse(data, response)
-        elif data.get('end_date'):
-            self.get_xlsx_report_inscription(data, response)
-        else:
-            self.get_xlsx_report_grouping(data, response)
+            'type': 'ir.actions.act_url',
+            'target': 'current',
+            'url': '/xlsx_reports?report_name='
+                   + (report_name or "")+'&start_date='+(str(self.start_date) or "")+'&end_date='+(str(self.end_date) or "")+
+                   '&get_model='+(str(self.get_model) or "")+'&semester_ids='+(str(tab) or "")+'&filename='+(str(report_name) or "")
 
-    def get_xlsx_report_caisse_by_statement(self, data, response):
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+
+        }
+    def get_xlsx_report(self, workbook, data):
+        if data.get('statement_id'):
+            self.get_xlsx_report_caisse_by_statement(workbook, data)
+        elif data.get('get_model') and data['get_model'] == 'rel_caisse':
+            self.get_xlsx_report_rel_caisse(workbook, data)
+        elif data.get('end_date'):
+            self.get_xlsx_report_inscription(workbook, data)
+        else:
+            self.get_xlsx_report_grouping(workbook, data)
+
+    def get_xlsx_report_caisse_by_statement(self, workbook, data):
         sheet = workbook.add_worksheet()
+
+        # column_width
+        sheet.set_column('A:A', 11)
+        sheet.set_column('B:B', 18)
+        sheet.set_column('C:C', 20)
+        sheet.set_column('D:K', 14)
+
         cell_format = workbook.add_format({'font_size': '12px', 'border':True})
         top_column_format = workbook.add_format({'font_size': '12px', 'bold':True,'border':True})
         total_format = workbook.add_format({'font_size': '16px', 'bold':True,'border':True})
@@ -273,15 +271,12 @@ class ExcelWizard(models.TransientModel):
             count += 1
             cell = column[count]+str(line)
             sheet.write(cell, f'{statement.balance_end_real:,}', total_format) 
-        workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
 
-    def get_xlsx_report_rel_caisse(self, data, response):
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    def get_xlsx_report_rel_caisse(self, workbook, data):
         sheet = workbook.add_worksheet()
+
+        sheet.set_column('A:G', 14)
+
         cell_format = workbook.add_format({'font_size': '12px'})
         top_column_format = workbook.add_format({'font_size': '13px', 'bold':True})
         head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
@@ -349,16 +344,12 @@ class ExcelWizard(models.TransientModel):
         cell = column[count]+str(line)
         sheet.write(cell, abs(amount_debit - amount_credit), top_column_format)
 
-
-        workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
-
-    def get_xlsx_report_grouping(self, data, response):
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    def get_xlsx_report_grouping(self, workbook, data):
         sheet = workbook.add_worksheet()
+        
+        # column_width
+        sheet.set_column('B:E', 15)
+
         cell_format = workbook.add_format({'font_size': '12px', 'border':True})
         top_column_format = workbook.add_format({'font_size': '13px', 'bold':True,'border': True})
         head = workbook.add_format({'align': 'center', 'bold': True,'font_size':'14px'})
@@ -414,15 +405,15 @@ class ExcelWizard(models.TransientModel):
 
             line +=1
 
-        workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
-
-    def get_xlsx_report_inscription(self, data, response):
-        output = io.BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    def get_xlsx_report_inscription(self, workbook, data):
         sheet = workbook.add_worksheet()
+        
+        # column_width
+        sheet.set_column('A:B', 13)
+        sheet.set_column('C:E', 20)
+        sheet.set_column('F:G', 13)
+        sheet.set_column('H:H', 22)
+        sheet.set_column('I:Z', 13)
         cell_format = workbook.add_format({'font_size': '12px', 'border': True})
         top_column_format = workbook.add_format({'font_size': '12px', 'bold':True, 'border': True})
         arrete_format = workbook.add_format({'font_size': '13px', 'bold':True})
@@ -528,8 +519,3 @@ class ExcelWizard(models.TransientModel):
                 cell = column[count]+str(line)
                 sheet.write(cell, ue.name.code or '', cell_format)
             line +=1
-
-        workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
