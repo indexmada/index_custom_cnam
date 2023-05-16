@@ -36,8 +36,8 @@ class AccountBankaStatement(models.Model):
 
 class ExcelWizard(models.TransientModel):
     _name = "example.xlsx.report.wizard"
-    start_date = fields.Date(string="Start Date", default=date.today(), required=True)
-    end_date = fields.Date(string="End Date", default=date.today(), required=False)
+    start_date = fields.Date(string="Date Début", default=date.today(), required=True)
+    end_date = fields.Date(string="Date Fin", default=date.today(), required=False)
     get_model = fields.Char(string="Model", required=False)
     semester_ids = fields.Many2many(string="Semestres", required=False, comodel_name="semestre.edu")
     def print_xlsx(self):
