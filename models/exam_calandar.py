@@ -246,7 +246,8 @@ class NoteListFilter(models.Model):
                     'intitule': unit_enseignes.display_name,
                     'unit_enseigne': unit_enseignes.name.id,
                     'centre_ids':[(4,center.id) for center in self.centre_ids],
-                    'tutor_id': self.tutor_id.id
+                    'tutor_id': self.tutor_id.id,
+                    'years_id': self.year.id
                     }
                 is_note_obj = self.env['note.list'].search([('audit','=',unit_enseignes.inscription_id.name),
                                                             ('name','=',unit_enseignes.inscription_id.name_marital),
@@ -269,7 +270,8 @@ class NoteListFilter(models.Model):
                     'intitule': unit_enseignes.display_name,
                     'unit_enseigne': unit_enseignes.name.id,
                     'centre_ids':[(4,center.id) for center in self.centre_ids],
-                    'tutor_id': self.tutor_id.id
+                    'tutor_id': self.tutor_id.id,
+                    'years_id': self.year.id
                     }
                 is_note_obj = self.env['note.list'].search([('audit','=',unit_enseignes.inscription_other_id.name),
                                                             ('name','=',unit_enseignes.inscription_other_id.name_marital),
