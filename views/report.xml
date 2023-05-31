@@ -701,9 +701,8 @@
                             <div t-if="notes" class="page" style="font-family: 'arial';">
                                 <div class="col-4 offset-8 text-left">
                                     <t t-esc="(o.student_name or '')+' '+(o.student_first_name or '')"/><br/>
-                                    <t t-set="insc" t-value="o.partner_id.inscription_id"/>
-                                    <t t-esc="insc.adress or ''"/><br/>
-                                    <t t-esc="insc.zip or ''"/> - <t t-esc="insc.town or ''"/>
+                                    <t t-esc="o.sudo().partner_id.street or ''"/><br/>
+                                    <t t-esc="o.sudo().partner_id.zip or ''"/> - <t t-esc="o.sudo().partner_id.city or ''"/><t t-esc="o.sudo().partner_id.country_id.name"/>
                                 </div>
                                 <br/>
                                 <h2 class="text-center"><strong>Relevé de note <t t-esc="o.note_list_filter_id.year.name"/></strong></h2>

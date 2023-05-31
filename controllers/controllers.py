@@ -37,14 +37,24 @@ class IndexCustomCnam(CustomerPortal):
 
     #     return "Dates updated"
 
-    @http.route('/index_custom_cnam/update_regrouping_date', auth='public')
-    def update_regrouping_date(self, **kw):
-        line_ids = request.env['regrouping.center.line'].sudo().search([('grouping_date','=', None)])
-        for line in line_ids:
-            if line.regrouping_id and line.regrouping_id.date:
-                line.write({'grouping_date': line.regrouping_id.date})
+    # @http.route('/index_custom_cnam/update_regrouping_date', auth='public')
+    # def update_regrouping_date(self, **kw):
+    #     line_ids = request.env['regrouping.center.line'].sudo().search([('grouping_date','=', None)])
+    #     for line in line_ids:
+    #         if line.regrouping_id and line.regrouping_id.date:
+    #             line.write({'grouping_date': line.regrouping_id.date})
 
-        return "Thanks! All date updated."
+    #     return "Thanks! All date updated."
+
+    @http.route('/update_street_student', auth='public')
+    def update_street_student(self, **kw):
+        insc_ids = request.env['inscription.edu'].sudo().search([])
+        for insc in insc_ids:
+            insc.student_id.write({
+                    'street': insc.adress
+                })
+
+        return "Thanks! All street updated."
 
     @http.route(['/my/cnam_documents'], type='http', auth="user", website=True)
     def portal_cnam_documents(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
