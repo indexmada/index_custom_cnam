@@ -209,7 +209,15 @@ class InscriptionEducation(models.Model):
     @api.depends("surname", "name_marital", "firstname")
     def compute_display_name(self):
         for insc in self:
-            insc.display_name = "%s %s %s" % (insc.surname, insc.name_marital, insc.firstname)
+            # insc.display_name = "%s %s %s" % (insc.surname, insc.name_marital, insc.firstname)
+            display_name = ''
+            if insc.surname:
+                display_name += insc.surname+' '
+            if insc.name_marital:
+                display_name += insc.name_marital+' '
+            if insc.firstname:
+                display_name += insc.firstname
+            insc.display_name = display_name
 
 class UEReport(models.Model):
     _inherit = "unit.enseigne"
