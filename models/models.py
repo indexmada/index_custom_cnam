@@ -57,7 +57,10 @@ class index_custom_cnam(models.Model):
         for line in self:
             end_time = '{0:02.0f}:{1:02.0f}'.format(*divmod(float(line.end_hours) * 60, 60))
             end_time = datetime.strptime(end_time.replace(':', ''),'%H%M').time()
-            line.end_date_time = datetime.combine(line.regrouping_id.date, end_time)
+            if end_time and line.regrouping_id.date:
+                line.end_date_time = datetime.combine(line.regrouping_id.date, end_time)
+            else:
+                line.end_date_time = None
 
     @api.depends("begin_hours", "end_hours")
     def compute_duration(self):
@@ -135,7 +138,7 @@ class ExamRoom(models.Model):
         """Get state Room"""
         now = fields.Datetime.now()
         for room in self:
-            regrouping = room.regrouping_lines_ids.filtered(lambda grouping: grouping.begin_date_time and grouping.begin_date_time <= now <= grouping.end_date_time)
+            regrouping = room.regrouping_lines_ids.filtered(lambda grouping: grouping.begin_date_time and grouping.end_date_time and grouping.begin_date_time <= now <= grouping.end_date_time)
             if regrouping:
                 room.state = 'busy' if regrouping.numbers_student > 0 else 'partially'
             else:
