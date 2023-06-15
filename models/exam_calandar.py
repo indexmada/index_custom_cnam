@@ -43,7 +43,7 @@ class index_custom_cnam(models.Model):
     def there_is_overlap(self, nb1,nb2,ch3,ch4):
         return not((nb1 < ch3 and nb2 < ch3) or (nb1 > ch4 and nb2 > ch4))
 
-    def get_available_day(self,day, time_from = 8.0, time_to = 12.0):
+    def get_available_day(self,day, exam_id, temp_insc_ids, time_from = 8.0, time_to = 12.0):
         week_day = self.get_week_day_of_date(day) #Return int 0:lundi, 1:mardi,...
         attendance_ok = False
         for attendance in self.calandar_id.attendance_ids:
@@ -55,7 +55,14 @@ class index_custom_cnam(models.Model):
         if not attendance_ok:
             return False
         for exam in self.exam_ids:
-            if (exam.date and exam.start_time and exam.end_time):
+            if (exam.date and exam.start_time and exam.end_time and exam != exam_id):
+                exam_insc_ids = exam.exam_repartition_ids.mapped('inscription_id')
+                current_exam_insc_ids = exam_id.exam_repartition_ids.mapped('inscription_id')
+                no_duplicated_insc = True
+                for insc in exam_insc_ids:
+                    if insc in temp_insc_ids:
+                        no_duplicated_insc = False
+
                 # exam_week_day = self.get_week_day_of_date(exam.date)
                 # if(exam.start_time<12):
                 #     start_time = 8
@@ -65,7 +72,8 @@ class index_custom_cnam(models.Model):
                 #     return False
 
                 if self.there_is_overlap(time_from, time_to, exam.start_time, exam.end_time) and day == exam.date:
-                    return False
+                    if not no_duplicated_insc:
+                        return False
 
         return {'date': day, 'start_time': time_from, 'end_time': time_to}
 
@@ -90,7 +98,7 @@ class index_custom_cnam(models.Model):
 
 
 
-    def request_available_date(self):
+    def request_available_date(self,exam,temp_insc_ids):
         date_request = self.start_date
         s = 8 #default start_time
         e = 12 #default end_time
@@ -100,7 +108,7 @@ class index_custom_cnam(models.Model):
                 s = tab_hours_ft[0]
             if tab_hours_ft[1]:
                 e = tab_hours_ft[1]
-        request_date = self.get_available_day(date_request, s, e)
+        request_date = self.get_available_day(date_request, exam, temp_insc_ids, s, e)
         i = 0
         while(not request_date):
             tab_hours_ft = self.get_default_start_and_end_time_for_date(date_request, e)
@@ -113,7 +121,7 @@ class index_custom_cnam(models.Model):
                 date_request = date_request+timedelta(1)
                 e = 6
 
-            request_date = self.get_available_day(date_request, s, e)
+            request_date = self.get_available_day(date_request, exam, temp_insc_ids, s, e)
 
             i += 1
             if i > 200:
@@ -132,8 +140,10 @@ class index_custom_cnam(models.Model):
                                                               ('semester','=',self.semester.id),
                                                               ('start_date','=',self.start_date)]).mapped('exam_ids')
         for exam in self.exam_ids:
+            temp_insc_ids = unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id).mapped('inscription_id')
+            temp_insc_ids |= unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id).mapped('inscription_other_id')
             if not (exam.date and exam.start_time != 0 and exam.end_time != 0):
-                dict_date = self.request_available_date()
+                dict_date = self.request_available_date(exam, temp_insc_ids)
                 if (dict_date != 'no'):
                     exam.sudo().write(dict_date)
 
@@ -189,7 +199,7 @@ class index_custom_cnam(models.Model):
         return dict_student
 
     def get_avalaible_room(self, date, start_time, end_time):
-        room_obj = self.env['examen.room'].search([('state','=','free')])
+        room_obj = self.env['examen.room'].search([])
         for room in room_obj:
             place_dispo = int(room.nb_place)
             occupied = 0
