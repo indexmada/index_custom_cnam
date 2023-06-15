@@ -140,8 +140,8 @@ class index_custom_cnam(models.Model):
                                                               ('semester','=',self.semester.id),
                                                               ('start_date','=',self.start_date)]).mapped('exam_ids')
         for exam in self.exam_ids:
-            temp_insc_ids = unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id).mapped('inscription_id')
-            temp_insc_ids |= unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id).mapped('inscription_other_id')
+            temp_insc_ids = unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id and self.semester == u.semestre_id).mapped('inscription_id')
+            temp_insc_ids |= unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id and self.semester == u.semestre_id).mapped('inscription_other_id')
             if not (exam.date and exam.start_time != 0 and exam.end_time != 0):
                 dict_date = self.request_available_date(exam, temp_insc_ids)
                 if (dict_date != 'no'):
@@ -151,7 +151,7 @@ class index_custom_cnam(models.Model):
             student_list = self.get_existant_student(exam)
             for unit_enseignes in unit_enseignes_obj:
                 inscription_id = unit_enseignes.inscription_id or unit_enseignes.inscription_other_id
-                if unit_enseignes.name in exam.ue_ids and exam.centre_ue_id.id==unit_enseignes.center_id.id:
+                if unit_enseignes.name in exam.ue_ids and exam.centre_ue_id.id==unit_enseignes.center_id.id and self.semester == unit_enseignes.semestre_id:
                     student=''
                     if inscription_id.name_marital:
                         student = inscription_id.name_marital
