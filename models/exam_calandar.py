@@ -185,6 +185,7 @@ class index_custom_cnam(models.Model):
                         else:
                             convocation_number = prefix+str(int_cn)
                             int_cn +=1
+                            self.write({'current_number_convocation': prefix+str(int_cn+1)})
                             vals = {
                                 'date': self.create_date.date(),
                                 'number_convocation': convocation_number,
