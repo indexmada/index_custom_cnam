@@ -166,9 +166,11 @@ class index_custom_cnam(models.Model):
                         exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':inscription_id.name, 'student':student, 'room': room_available, 'table': place_available, 'inscription_id': inscription_id.id})]})
                         student_list.append(student)
 
-                        convocation_student = self.env['convocation.list'].sudo().search([('school_year', '=', self.school_year.id), ('inscription_id', '=', inscription_id.id)], limit=1)
+                        exam_convocation = self.exam_ids.mapped('convocation_ids')
+                        convocation_student = self.env['convocation.list'].sudo().search([('school_year', '=', self.school_year.id), ('inscription_id', '=', inscription_id.id), ('id', 'in', exam_convocation.ids)], limit=1)
+                        
                         if convocation_student:
-                            convocation_student.write({'line_ids': [(0, 0, {'code':exam.ue_ids_string,'display_name':exam.ue_ids_string,
+                            convocation_student.write({'line_ids': [(0, 0, {'code':exam.ue_code_string,'display_name':exam.ue_ids_string,
                                     'date':exam.date,'start_time':exam.start_time,
                                     'end_time':exam.end_time,'room':room_available,'table':place_available})]})
                             exam.write({'convocation_ids': [(4,convocation_student.id)]})
