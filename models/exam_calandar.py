@@ -139,6 +139,14 @@ class index_custom_cnam(models.Model):
                                                               ('session','=',self.session.id),
                                                               ('semester','=',self.semester.id),
                                                               ('start_date','=',self.start_date)]).mapped('exam_ids')
+        current_number = self.current_number_convocation
+        try:
+            int_cn = int(current_number)
+            prefix = current_number.replace(str(int_cn), '')
+        except:
+            int_cn = 1
+            prefix = '000'
+
         for exam in self.exam_ids:
             temp_insc_ids = unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id and self.semester == u.semestre_id).mapped('inscription_id')
             temp_insc_ids |= unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id and self.semester == u.semestre_id).mapped('inscription_other_id')
@@ -175,8 +183,11 @@ class index_custom_cnam(models.Model):
                                     'end_time':exam.end_time,'room':room_available,'table':place_available})]})
                             exam.write({'convocation_ids': [(4,convocation_student.id)]})
                         else:
+                            convocation_number = prefix+str(int_cn)
+                            int_cn +=1
                             vals = {
                                 'date': self.create_date.date(),
+                                'number_convocation': convocation_number,
                                 'student_id': student,
                                 'formation_id': inscription_id.formation_id.id,
                                 'auditor_number': inscription_id.name,
