@@ -560,7 +560,7 @@
                                     </tr>
                                     <tr>
                                         <td/>
-                                        <td class="text-center"><img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/></td>
+                                        <td class="text-center"><img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/><div t-else="" style="min-height:130px;"/></td>
                                     </tr>
                                     <tr>
                                         <td/>
@@ -657,6 +657,7 @@
                                         Pour l'Administratrice Générale et par délégation
                                         <div>
                                           <img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
+                                          <div t-else="" style="min-height: 130px;"/>
                                         </div>
                                     <br/>
                                     Le Directeur du centre<br/>
@@ -740,6 +741,7 @@
                                         Pour l'Administratrice Générale et par délégation
                                         <div>
                                           <img t-if="company.sign_director and company.pdf_display_sign" t-att-src="image_data_uri(company.sign_director)" style="max-height: 130px;" alt="Logo"/>
+                                          <div t-else="min-height:130px;"/>
                                         </div>
                                     <br/>
                                     Le Directeur du centre<br/>
