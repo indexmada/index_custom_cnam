@@ -130,6 +130,11 @@ class index_custom_cnam(models.Model):
                 request_date = 'no'
         return request_date
 
+    def get_failed_student(self, ues):
+        note_list_filter_ids = self.env['note.list.filter'].sudo().search([('year','=', self.school_year.id), ('unit_enseigne', 'in', ues.ids)]).filtered(lambda n: n.session.name.find('1')> 0 )
+        note_list_ids = note_list_filter_ids.mapped('note_list_ids')
+        filtered_note = note_list_ids.filtered(lambda note: note.mention in ['defaillant', 'ajourne'])
+        return filtered_note.mapped('partner_id')
 
     def calculate(self):
         unit_enseignes_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account'))]).mapped('units_enseignes')
@@ -177,6 +182,15 @@ class index_custom_cnam(models.Model):
                         exam_convocation = self.exam_ids.mapped('convocation_ids')
                         convocation_student = self.env['convocation.list'].sudo().search([('school_year', '=', self.school_year.id), ('inscription_id', '=', inscription_id.id), ('id', 'in', exam_convocation.ids)], limit=1)
                         
+                        if self.session.name.find('2')  > 0 :
+                            print('*_#'*20)
+                            student_id = inscription_id.student_id
+                            student_ids = self.get_failed_student(exam.ue_ids)
+                            if student_id not in student_ids:
+                                print('___Mamerina:',student_id.display_name)
+                                continue
+                            print(student_id.display_name)
+
                         if convocation_student:
                             convocation_student.write({'line_ids': [(0, 0, {'code':exam.ue_code_string,'display_name':exam.ue_ids_string,
                                     'date':exam.date,'start_time':exam.start_time,
