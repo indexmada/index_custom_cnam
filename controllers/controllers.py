@@ -37,14 +37,27 @@ class IndexCustomCnam(CustomerPortal):
 
     #     return "Dates updated"
 
-    # @http.route('/index_custom_cnam/update_regrouping_date', auth='public')
-    # def update_regrouping_date(self, **kw):
-    #     line_ids = request.env['regrouping.center.line'].sudo().search([('grouping_date','=', None)])
-    #     for line in line_ids:
-    #         if line.regrouping_id and line.regrouping_id.date:
-    #             line.write({'grouping_date': line.regrouping_id.date})
+    @http.route('/cnam/supprimer/convocation', auth='public')
+    def delete_convocation(self, **kw):
+        exam_ids = request.env['exam.calandar'].sudo().search([]).filtered(lambda e: e.session.name.find('2') > 0)
+        print('exam_ids:', exam_ids)
+        for exam_cal in exam_ids:
+            print('_'*56)
+            print(exam_cal.name)
+            ue_ids = exam_cal.exam_ids.mapped('ue_ids')
+            student_ids = exam_cal.get_failed_student(ue_ids)
 
-    #     return "Thanks! All date updated."
+            convocation_ids = exam_cal.exam_ids.mapped('convocation_ids')
+            for conv in convocation_ids:
+                student_id = conv.inscription_id.student_id
+                if student_id not in student_ids:
+                    print('unlink: ',conv)
+                    conv.sudo().unlink()
+                else:
+                    print( student_id.display_name)
+
+        return "convocation ok!"
+
 
     @http.route('/update_street_student', auth='public')
     def update_street_student(self, **kw):
