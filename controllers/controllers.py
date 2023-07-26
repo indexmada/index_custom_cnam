@@ -40,10 +40,8 @@ class IndexCustomCnam(CustomerPortal):
     @http.route('/cnam/supprimer/convocation', auth='public')
     def delete_convocation(self, **kw):
         exam_ids = request.env['exam.calandar'].sudo().search([]).filtered(lambda e: e.session.name.find('2') > 0)
-        print('exam_ids:', exam_ids)
+
         for exam_cal in exam_ids:
-            print('_'*56)
-            print(exam_cal.name)
             ue_ids = exam_cal.exam_ids.mapped('ue_ids')
             student_ids = exam_cal.get_failed_student(ue_ids)
 
@@ -51,10 +49,15 @@ class IndexCustomCnam(CustomerPortal):
             for conv in convocation_ids:
                 student_id = conv.inscription_id.student_id
                 if student_id not in student_ids:
-                    print('unlink: ',conv)
                     conv.sudo().unlink()
                 else:
-                    print( student_id.display_name)
+                    for exam in exam_cal.exam_ids:
+                        ues = exam.ue_ids
+                        stu_ids = exam_cal.get_failed_student(ues)
+                        if student_id not in stu_ids:
+                            for line in conv.line_ids:
+                                if line.code == exam.ue_code_string:
+                                    line.sudo().unlink()
 
         return "convocation ok!"
 
