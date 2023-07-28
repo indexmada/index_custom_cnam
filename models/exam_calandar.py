@@ -79,7 +79,17 @@ class index_custom_cnam(models.Model):
 
 
                     
-    def recalculate(self):                    
+    def recalculate(self):
+        if self.session.name.find('2')  > 0 :
+            for exam in self.exam_ids:
+                repartition_ids = exam.exam_repartition_ids
+                for rep in repartition_ids:
+                    rep.unlink()
+
+                convocation_ids = exam.convocation_ids
+                for conv in convocation_ids:
+                    conv.unlink()
+
         self.calculate()
 
     def get_default_start_and_end_time_for_date(self, date, after):
@@ -133,7 +143,7 @@ class index_custom_cnam(models.Model):
     def get_failed_student(self, ues):
         note_list_filter_ids = self.env['note.list.filter'].sudo().search([('year','=', self.school_year.id), ('unit_enseigne', 'in', ues.ids)]).filtered(lambda n: n.session.name.find('1')> 0 )
         note_list_ids = note_list_filter_ids.mapped('note_list_ids')
-        filtered_note = note_list_ids.filtered(lambda note: note.mention in ['defaillant', 'ajourne'])
+        filtered_note = note_list_ids.filtered(lambda note: note.mention != 'admis' or note.validation == 'waiting')
         return filtered_note.mapped('partner_id')
 
     def calculate(self):
