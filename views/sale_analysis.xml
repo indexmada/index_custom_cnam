@@ -8,6 +8,8 @@
                 <field name="insc_date"/>
                 <field name="n_auditeur"/>
                 <field name="global_insc"/>
+                <field name="exam_center"/>
+                <field name="email"/>
                 <field name="name"/>
                 <field name="cost_ariary" sum='Total Tax' string="Coût Total"/>
                 <field name="currency_id"/>
@@ -39,6 +41,7 @@
         <field name="res_model">unit.enseigne</field>
         <field name="view_mode">tree,search</field>
         <field name="context">{'search_default_group_by_ue': 1}</field>
+        <field name="domain">['|', ('inscription_id', '!=', False), ('inscription_other_id', '!=', False)]</field>
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
            Analyse de vente des UE. 

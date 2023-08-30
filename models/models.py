@@ -245,6 +245,16 @@ class UEReport(models.Model):
     inscri_state = fields.Selection(SELECTION_STATE, string="Statut", compute="get_insc_state", default=default_insc_state, store=True)
     n_auditeur = fields.Char("Numéro auditeur", compute="get_n_auditeur")
 
+    email = fields.Char("Email", compute="compute_val")
+    exam_center = fields.Many2one("region.center", string="Centre d'examen", compute="compute_val")
+
+    def compute_val(self):
+        for rec in self:
+            global_insc = rec.inscription_id or rec.inscription_other_id
+            if global_insc:
+                rec.email = global_insc.email
+                rec.exam_center = global_insc.region_center_id
+
     def get_n_auditeur(self):
         for record in self:
             record.n_auditeur = record.global_insc.name
