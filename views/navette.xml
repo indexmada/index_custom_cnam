@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+    <record id="navette_action" model="ir.actions.server">
+        <field name="name">Fiche Navette</field>
+        <field name="model_id" ref="edu_management.model_inscription_edu"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.export_fiche_navette()
+        </field>
+    </record>
+    </data>
+</odoo>

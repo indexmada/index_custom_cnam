@@ -225,6 +225,23 @@ class InscriptionEducation(models.Model):
                 display_name += insc.firstname
             insc.display_name = display_name
 
+    def export_fiche_navette(self):
+        report_name = "fiche_navette.xlsx"
+        id_tab = False
+        for i in self:
+            if not id_tab:
+                id_tab = str(i.id)
+            else:
+                id_tab += "_"+str(i.id)
+        if not id_tab:
+            id_tab=""
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'current',
+            'url': '/navette_export?file_name='
+                   + (report_name or "")+'&id_tab='+id_tab        
+        }  
+
 class UEReport(models.Model):
     _inherit = "unit.enseigne"
 

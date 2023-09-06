@@ -37,6 +37,7 @@
         'views/action_manager.xml',
         'views/wizard_view.xml',
         'wizard/xls_comparison.xml',
+        'views/navette.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
