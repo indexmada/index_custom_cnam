@@ -147,8 +147,8 @@ class index_custom_cnam(models.Model):
         return filtered_note.mapped('partner_id')
 
     def calculate(self):
-        unit_enseignes_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account'))]).mapped('units_enseignes')
-        other_ues_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account'))]).mapped('other_ue_ids')
+        unit_enseignes_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account')), ('school_year', '=', self.school_year.id)]).mapped('units_enseignes')
+        other_ues_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account')), ('school_year', '=', self.school_year.id)]).mapped('other_ue_ids')
         unit_enseignes_obj |= other_ues_obj
         exam_obj = self.env['exam.calandar'].search([('school_year','=',self.school_year.id),
                                                               ('session','=',self.session.id),
