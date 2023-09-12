@@ -242,6 +242,11 @@ class InscriptionEducation(models.Model):
                    + (report_name or "")+'&id_tab='+id_tab        
         }  
 
+    def action_regenerate_num_audit(self):
+        for rec in self:
+            num_audit = rec.generate_num_auditeur()
+            rec.write({'name': num_audit})
+
 class UEReport(models.Model):
     _inherit = "unit.enseigne"
 
