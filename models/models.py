@@ -244,7 +244,11 @@ class InscriptionEducation(models.Model):
 
     def action_regenerate_num_audit(self):
         for rec in self:
-            num_audit = rec.generate_num_auditeur()
+            # num_audit = rec.generate_num_auditeur()
+            insc = True
+            while(insc):
+                num_audit = rec.generate_num_auditeur()
+                insc = self.env['inscription.edu'].sudo().search([('name', '=', num_audit)])
             rec.write({'name': num_audit})
 
 class UEReport(models.Model):
