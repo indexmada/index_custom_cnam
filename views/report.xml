@@ -523,13 +523,13 @@
                                 <p>Nous susnommé(e)s et soussigné(e)s, co-responsables de l’engagement, nous engageons par la présente, quelque soit le taux de mon assiduité aux cours de l’Unité d’Enseignement auquel je me suis inscrit(e) au centre de formation CNAM<br/>Relative aux frais de formation, qui s’élève à  
                                 <strong>
                                     <t t-if="o.amount_total_ariary">
-                                        <t t-esc="o.amount_total_ariary"/> Ariary
+                                        <t t-esc="'{:,}' .format(o.amount_total_ariary)"/> Ariary
                                     </t>
                                     <t t-if="o.amount_total_ariary and o.amount_total_euro">
                                         et
                                     </t>
                                     <t t-if="o.amount_total_euro">
-                                        <t t-esc="round(o.amount_total_euro, 2)"/> Euro
+                                        <t t-esc="'{:,}' .format(round(o.amount_total_euro, 2))"/> Euro
                                     </t>
                                     <t t-foreach="o.units_enseignes" t-as="ue">
                                         <t t-esc="ue.name.code"/>
