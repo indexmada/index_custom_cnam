@@ -5,6 +5,8 @@ import json
 from datetime import datetime
 from datetime import timedelta
 
+import random
+
 class ExamRepartition(models.Model):
     _inherit ="exam.repartition"
 
@@ -184,8 +186,8 @@ class index_custom_cnam(models.Model):
                         student = inscription_id.name_marital+inscription_id.firstname
 
                     if student not in student_list:
-                        room_available = self.get_avalaible_room(exam.date, exam.start_time, exam.end_time)
-                        place_available = self.get_avalaible_place(room_available, exam.date, exam.start_time, exam.end_time)
+                        room_available = self.get_avalaible_room(exam.date, exam.start_time, exam.end_time, exam)
+                        place_available = self.get_avalaible_place(room_available, exam.date, exam.start_time, exam.end_time,exam)
                         exam.write({'exam_repartition_ids':[(0,0,{'auditor_number':inscription_id.name, 'student':student, 'room': room_available, 'table': place_available, 'inscription_id': inscription_id.id})]})
                         student_list.append(student)
 
@@ -236,9 +238,15 @@ class index_custom_cnam(models.Model):
 
         return dict_student
 
-    def get_avalaible_room(self, date, start_time, end_time):
+    def get_avalaible_room(self, date, start_time, end_time, examen):
         room_obj = self.env['examen.room'].search([])
-        for room in room_obj:
+        room_tab = []
+        for r in room_obj:
+            room_tab.append(r.id)
+        random.shuffle(room_tab)
+        temp_room = False
+        for room_id in room_tab:
+            room = self.env['examen.room'].sudo().browse(room_id)
             place_dispo = int(room.nb_place)
             occupied = 0
             for exam in self.exam_ids:
@@ -247,14 +255,22 @@ class index_custom_cnam(models.Model):
                         if room.name == repartition.room:
                             occupied +=1
 
+            nb_table_dispo = len(room.table_ids)
+            nb_table_oqp = len(examen.exam_repartition_ids.filtered(lambda x: x.room == room.name ))
+
+            if nb_table_oqp >= nb_table_dispo:
+                if place_dispo > occupied:
+                    temp_room = room.name
+                continue
             if place_dispo > occupied:
                 return room.name
 
-        return ''
+        return temp_room or ''
 
 
-    def get_avalaible_place(self, room, date, start_time, end_time):
+    def get_avalaible_place(self, room, date, start_time, end_time, examen):
         table_obj = self.env['examen.room'].search([('name','=',room)]).mapped('table_ids')
+        temp_table = False
         for table in table_obj:
             place_dispo = int(table.nb_place)
             occupied = 0
@@ -264,10 +280,15 @@ class index_custom_cnam(models.Model):
                         if table.name == repartition.table:
                             occupied +=1
 
+            if examen.exam_repartition_ids.filtered(lambda y: y.table == table.name and y.room == table.examen_room_id.name):
+                if place_dispo > occupied:
+                    temp_table = table.name
+                continue
+
             if place_dispo > occupied:
                 return table.name
 
-        return ''
+        return temp_table or ''
 
 
     def there_is_overlap(self, nb1,nb2,ch3,ch4):
