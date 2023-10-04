@@ -540,8 +540,8 @@
                                 </strong> selon le calendrier ci-après:</p>
                                 <t t-set="count" t-value="1"/>
                                 <div t-foreach="o.payment_inscription_ids" t-as="pi_id">
-                                    <div style="display: inline-block" class="col-4" t-if="count == 1">1er Paiement: <strong t-esc="round(pi_id.cost_devise,2)"/> <strong t-esc="pi_id.currency_id.name"/></div>
-                                    <div style="display: inline-block" class="col-4" t-else=""><t t-esc="count"/>eme Paiement: <strong t-esc="round(pi_id.cost_devise,2)"/> <strong t-esc="pi_id.currency_id.name"/></div>
+                                    <div style="display: inline-block" class="col-4" t-if="count == 1">1er Paiement: <strong t-esc="'{:,}' .format(round(pi_id.cost_devise,2))"/> <strong t-esc="pi_id.currency_id.name"/></div>
+                                    <div style="display: inline-block" class="col-4" t-else=""><t t-esc="count"/>eme Paiement: <strong t-esc="'{:,}' .format(round(pi_id.cost_devise,2))"/> <strong t-esc="pi_id.currency_id.name"/></div>
                                     <div style="display: inline-block" class="col-6 text-right">
                                     Avant le <strong t-esc="pi_id.date.strftime('%d-%m-%Y')"/> (<strong t-esc="pi_id.ref_rc"/>)
                                     </div>
