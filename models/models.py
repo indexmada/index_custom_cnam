@@ -255,6 +255,19 @@ class UEReport(models.Model):
     _inherit = "unit.enseigne"
 
     @api.model
+    def default_insc_date_stored(self):
+        for record in self:
+            print('#...'*20)
+            print('here')
+            if record.inscription_id:
+                record.insc_date_stored = record.inscription_id.inscription_date
+            elif record.inscription_other_id:
+                record.insc_date_stored = record.inscription_other_id.inscription_date
+            else:
+                print('none: ', record.id)
+                record.insc_date_stored = None
+
+    @api.model
     def default_insc_state(self):
         for record in self:
             print('*'*100) 
@@ -266,7 +279,8 @@ class UEReport(models.Model):
 
 
 
-    insc_date = fields.Date("Date d'inscription", compute="compute_insc_date")
+    insc_date = fields.Date("Date d'inscription(non-storable)", compute="compute_insc_date")
+    insc_date_stored = fields.Date("Date d'inscription", default=default_insc_date_stored, compute="get_insc_date_stored", store=True)
     global_insc = fields.Many2one("inscription.edu", string="Etudiant", compute="get_global_insc")
     inscri_state = fields.Selection(SELECTION_STATE, string="Statut", compute="get_insc_state", default=default_insc_state, store=True)
     n_auditeur = fields.Char("Numéro auditeur", compute="get_n_auditeur")
@@ -300,3 +314,16 @@ class UEReport(models.Model):
                 record.inscri_state = record.inscription_id.state
             elif record.inscription_other_id:
                 record.inscri_state = record.inscription_other_id.state
+
+    @api.depends("inscription_id", "inscription_other_id", "inscription_id.inscription_date", "inscription_other_id.inscription_date")
+    def get_insc_date_stored(self):
+        for record in self:
+            print('#...'*20)
+            print('here')
+            if record.inscription_id:
+                record.insc_date_stored = record.inscription_id.inscription_date
+            elif record.inscription_other_id:
+                record.insc_date_stored = record.inscription_other_id.inscription_date
+            else:
+                print('none: ', record.id)
+                record.insc_date_stored = None

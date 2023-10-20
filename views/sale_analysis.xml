@@ -15,6 +15,7 @@
                 <field name="currency_id"/>
                 <field name="cost_devise"/>
                 <field name="inscri_state"/>
+                <field name="insc_date_stored"/>
             </tree>
         </field>
     </record>

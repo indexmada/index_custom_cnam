@@ -18,6 +18,16 @@ class IndexCustomCnam(CustomerPortal):
     #     ue.update_currency_cost()
     #     return "all cost updated"
 
+    @http.route('/update/inscription_date', auth='public')
+    def update_ins_date(self, **kw):
+        records = http.request.env['unit.enseigne'].sudo().search(['|',('inscription_id', '!=', False), ('inscription_other_id', '!=', False)])
+        for record in records:
+            if record.inscription_id:
+                record.write({'insc_date_stored' : record.inscription_id.inscription_date})
+            elif record.inscription_other_id:
+                record.write({'insc_date_stored' : record.inscription_other_id.inscription_date})
+        return "Date d'inscription mis à jour"
+
 
     # @http.route('/index_custom_cnam/update_payment_term', auth='public')
     # def update_payment_term(self, **kw):
