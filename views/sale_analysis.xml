@@ -5,7 +5,8 @@
         <field name="model">unit.enseigne</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="insc_date"/>
+                <field name="insc_date_stored"/>
+                <field name="insc_date" invisible="1"/>
                 <field name="n_auditeur"/>
                 <field name="global_insc"/>
                 <field name="exam_center"/>
@@ -15,7 +16,6 @@
                 <field name="currency_id"/>
                 <field name="cost_devise"/>
                 <field name="inscri_state"/>
-                <field name="insc_date_stored"/>
             </tree>
         </field>
     </record>
