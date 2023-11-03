@@ -11,14 +11,31 @@ class ExamRepartition(models.Model):
     _inherit ="exam.repartition"
 
     inscription_id = fields.Many2one("inscription.edu", string="Inscription")
-    inscription_id_name_formated = fields.Char("Étudiant", compute="compute_inscription_id_name_formated")
+    inscription_id_name_formated = fields.Char("Étudiant", compute="compute_inscription_id_name_formated", store=True)
     def get_exam_center(self):
         for record in self:
             record.center_ids = record.inscription_id.region_center_id
 
+    @api.depends('inscription_id', 'inscription_id.surname', 'inscription_id.firstname')
     def compute_inscription_id_name_formated(self):
         for rec in self:
             rec.inscription_id_name_formated = (rec.inscription_id.surname or '') + ' ' + (rec.inscription_id.firstname or '')
+
+class ExamExam(models.Model):
+     _inherit = "exam.exam"
+
+     center_ids_computed = fields.Many2many('region.center', string='Centres', compute="get_center_ids")
+
+     def get_center_ids(self):
+        for record in self:
+            region_centers = False
+            if record.exam_repartition_ids:
+                for repartition_id in record.exam_repartition_ids:
+                    if not region_centers:
+                        region_centers = repartition_id.center_ids
+                    else:
+                        region_centers |= repartition_id.center_ids
+            record.center_ids_computed = region_centers
 
 class ConvocationList(models.Model):
     _inherit="convocation.list"
