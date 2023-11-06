@@ -434,3 +434,7 @@ class NoteList(models.Model):
     def get_all_note_by_student_by_year(self, partner_id, year_id):
         notes = self.sudo().search([('partner_id', '=', partner_id), ('years_id', '=', year_id)])
         return notes or False
+
+    def get_insc_info(self):
+        insc_id = self.env['inscription.edu'].sudo().search([('student_id', '=', self.partner_id.id), ('school_year', '=', self.note_list_filter_id.year.id)], limit=1)
+        return insc_id
