@@ -428,11 +428,11 @@ class NoteList(models.Model):
     _inherit="note.list"
 
     def get_note_by_student(self, partner_id):
-        notes = self.sudo().search([('partner_id', '=', partner_id), ('mention', '=', 'admis')])
+        notes = self.sudo().search([('partner_id', '=', partner_id), ('mention', '=', 'admis'), ('validation', '=', 'validated')])
         return notes or False
 
     def get_all_note_by_student_by_year(self, partner_id, year_id):
-        notes = self.sudo().search([('partner_id', '=', partner_id), ('years_id', '=', year_id)])
+        notes = self.sudo().search([('partner_id', '=', partner_id), ('years_id', '=', year_id), ('validation', '=', 'validated')])
         return notes or False
 
     def get_insc_info(self):

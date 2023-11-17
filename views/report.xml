@@ -635,9 +635,9 @@
                                 <div>A obtenu les Unités d'Enseignement suivantes durant l'année universitaire  : <span t-esc="au or ''" /></div><br/>
                                 <table class="table table-bordered">
                                     <tr>
-                                        <td>N° UE</td>
-                                        <td>Intitulé</td>
-                                        <td>Note /20</td>
+                                        <td style="border: 1px solid black;">N° UE</td>
+                                        <td style="border: 1px solid black;">Intitulé</td>
+                                        <td style="border: 1px solid black;">Note /20</td>
                                     </tr>
                                     <tr>
 
@@ -648,9 +648,9 @@
 
                                         <t t-foreach="notes" t-as="note">
                                             <tr>
-                                                <td><t t-esc="note.note_list_filter_id.unit_enseigne.code"/></td>
-                                                <td><t t-esc="note.note_list_filter_id.unit_enseigne.display_name"/></td>
-                                                <td><t t-esc="note.note_sem2 or note.note_sem1"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.code"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.display_name"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.note_sem2 or note.note_sem1"/></td>
                                             </tr>
                                         </t>
 
@@ -731,19 +731,19 @@
                                 <h2 class="text-center"><strong>RELEVE DE NOTE <t t-esc="o.note_list_filter_id.year.name"/></strong></h2>
                                 <br/>
 
-                                <table class="table table-bordered">
+                                <table id="tab_result" class="table table-bordered">
                                     <tr>
-                                        <td>Unités</td>
-                                        <td>Notes</td>
-                                        <td>Etat</td>
+                                        <td style="border: 1px solid black;">Unités</td>
+                                        <td style="border: 1px solid black;">Notes</td>
+                                        <td style="border: 1px solid black;">Etat</td>
                                     </tr>
                                     <tr>
 
                                         <t t-foreach="notes" t-as="note">
                                             <tr t-if="note.mention != 'defaillant'">
-                                                <td><t t-esc="note.unit_enseigne.display_name"/></td>
-                                                <td><t t-esc="note.note_sem2 or note.note_sem1"/></td>
-                                                <td><t t-esc="note.mention"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.unit_enseigne.display_name"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.note_sem2 or note.note_sem1"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.mention"/></td>
                                             </tr>
                                         </t>
 
