@@ -193,7 +193,7 @@ class index_custom_cnam(models.Model):
             student_list = self.get_existant_student(exam)
             for unit_enseignes in unit_enseignes_obj:
                 inscription_id = unit_enseignes.inscription_id or unit_enseignes.inscription_other_id
-                if unit_enseignes.name in exam.ue_ids and exam.centre_ue_id.id==unit_enseignes.center_id.id and (self.semester == unit_enseignes.semestre_id or (self.semester_annuel and self.semester_annuel == unit_enseignes.semestre_id)):
+                if unit_enseignes.name in exam.ue_ids and exam.centre_ue_id.id==unit_enseignes.center_id.id and (self.semester == unit_enseignes.semestre_id or (self.semester_annuel and self.semester_annuel == unit_enseignes.semestre_id)) and inscription_id.region_center_id in exam.center_ids:
                     student=''
                     if inscription_id.name_marital:
                         student = inscription_id.name_marital
