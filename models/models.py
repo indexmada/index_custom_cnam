@@ -159,7 +159,8 @@ class UnitEnseignementConfig(models.Model):
 
     formation_ids = fields.Many2many("training.edu", string="Formations", default=_get_default_formation_ids)
     years = fields.Many2many("year.year", string="Années")
-
+    same_exam_room = fields.Boolean("Même Salle d'examen", default = False)
+    
     def merge_ue(self):
         print('*'*100)
         print('Merging ue..............')

@@ -256,11 +256,21 @@ class index_custom_cnam(models.Model):
         return dict_student
 
     def get_avalaible_room(self, date, start_time, end_time, examen):
-        room_obj = self.env['examen.room'].search([])
+        is_same_exam_room = True if True in examen.ue_ids.mapped('same_exam_room') else False
+        room_obj = False
+        if is_same_exam_room:
+            used_room_ids = examen.exam_calandar_id.exam_ids.filtered(lambda x: x.id != examen.id).mapped('exam_repartition_ids').mapped('room')
+            room_obj = self.env['examen.room'].search([('name', 'not in', used_room_ids)])
+        
+        if not room_obj:
+            room_obj = self.env['examen.room'].search([])
         room_tab = []
         for r in room_obj:
             room_tab.append(r.id)
-        random.shuffle(room_tab)
+
+        if not is_same_exam_room:
+            random.shuffle(room_tab)
+
         temp_room = False
         for room_id in room_tab:
             room = self.env['examen.room'].sudo().browse(room_id)
@@ -272,13 +282,16 @@ class index_custom_cnam(models.Model):
                         if room.name == repartition.room:
                             occupied +=1
 
-            nb_table_dispo = len(room.table_ids)
-            nb_table_oqp = len(examen.exam_repartition_ids.filtered(lambda x: x.room == room.name ))
 
-            if nb_table_oqp >= nb_table_dispo:
-                if place_dispo > occupied:
-                    temp_room = room.name
-                continue
+
+            if not is_same_exam_room:
+                nb_table_dispo = len(room.table_ids)
+                nb_table_oqp = len(examen.exam_repartition_ids.filtered(lambda x: x.room == room.name ))
+
+                if nb_table_oqp >= nb_table_dispo:
+                    if place_dispo > occupied:
+                        temp_room = room.name
+                    continue
             if place_dispo > occupied:
                 return room.name
 

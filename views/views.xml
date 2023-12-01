@@ -13,6 +13,7 @@
             <xpath expr="//field[@name='formation_id']" position="replace">
                 <field name="formation_id" string="Save Formation"/>
                 <field name="formation_ids" widget="many2many_tags"/>
+                <field name="same_exam_room"/>
             </xpath>
             <xpath expr="//field[@name='year']" position="replace">
                 <field name="year" string="Save Année"/>
