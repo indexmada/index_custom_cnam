@@ -14,6 +14,7 @@
                 <field name="formation_id" string="Save Formation"/>
                 <field name="formation_ids" widget="many2many_tags"/>
                 <field name="same_exam_room"/>
+                <p attrs="{'invisible': [('same_exam_room', '=', False)]}">Note: Il est conseillé de mettre les examens contenant cette unités d'enseignements en haut de la liste des examens dans le calendrier (Créer l'examen contenant cette UE avant les autres).</p>
             </xpath>
             <xpath expr="//field[@name='year']" position="replace">
                 <field name="year" string="Save Année"/>
