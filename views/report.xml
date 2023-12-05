@@ -649,7 +649,7 @@
                                         <t t-foreach="notes" t-as="note">
                                             <tr>
                                                 <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.code"/></td>
-                                                <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.display_name"/></td>
+                                                <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.name"/></td>
                                                 <td style="border: 1px solid black;"><t t-esc="note.note_sem2 or note.note_sem1"/></td>
                                             </tr>
                                         </t>

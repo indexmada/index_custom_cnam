@@ -281,6 +281,8 @@ class index_custom_cnam(models.Model):
                     for repartition in exam.exam_repartition_ids:
                         if room.name == repartition.room:
                             occupied +=1
+                            if True in exam.ue_ids.mapped('same_exam_room') and room.name in exam.exam_repartition_ids.mapped('room') and examen != exam:
+                                occupied = place_dispo
 
 
 
