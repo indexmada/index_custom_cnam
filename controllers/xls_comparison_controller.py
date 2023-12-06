@@ -11,6 +11,7 @@ from odoo.http import request
 
 from datetime import date
 
+UE_CENTER_NAME = ['MADAGASCAR', 'REUNION']
 
 class xlsComparisonController(http.Controller):
 
@@ -464,9 +465,9 @@ class InscriptionEdu(http.Controller):
 
             ue_ids = ins.units_enseignes + ins.other_ue_ids
             line = 40
-            for ue in ue_ids:
+            for ue in ue_ids.filtered(lambda x: x.center_id.name.upper() not in UE_CENTER_NAME):
                 cell = "A"+str(line)
-                worksheet_ost.write(cell, ins.inscription_date, cell_10_center)
+                worksheet_ost.write(cell, ins.inscription_date.strftime("%d/%m/%Y") if ins.inscription_date else '', cell_10_center)
                 cell = "B"+str(line)
                 worksheet_ost.write(cell, '', cell_10_center)
                 cell = "C"+str(line)
