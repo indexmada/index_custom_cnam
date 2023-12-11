@@ -308,7 +308,10 @@ class InscriptionEdu(http.Controller):
             if not ins:
                 continue
 
-            worksheet_ost = workbook.add_worksheet(ins.display_name)
+            sheet_name = str(ins.id)+" - "+ ins.display_name
+            print("_"*100)
+            print(sheet_name)
+            worksheet_ost = workbook.add_worksheet(sheet_name)
             self.style(worksheet_ost)
 
             cell_bold_center_11 = workbook.add_format({
@@ -418,7 +421,7 @@ class InscriptionEdu(http.Controller):
             worksheet_ost.write("E8", "Centre régional correspondant: ", right_10)
             worksheet_ost.write("F8", ins.examen_center_id.name or '', left_10)
             worksheet_ost.write("E9", "Fax: ", right_10)
-            worksheet_ost.write("A10", "Année: "+ins.school_year.name, left_10)
+            worksheet_ost.write("A10", "Année: "+ins.school_year.name if ins.school_year else '', left_10)
             worksheet_ost.write("A11", "Contact: ", left_10)
             worksheet_ost.write("A12", "Jocelyn RASOANAIVO ", left_10)
             worksheet_ost.write("A13", "261 20 22 290 19", left_10)
@@ -465,7 +468,7 @@ class InscriptionEdu(http.Controller):
 
             ue_ids = ins.units_enseignes + ins.other_ue_ids
             line = 40
-            for ue in ue_ids.filtered(lambda x: x.center_id.name.upper() not in UE_CENTER_NAME):
+            for ue in ue_ids.filtered(lambda x: x.center_id and x.center_id.name.upper() not in UE_CENTER_NAME):
                 cell = "A"+str(line)
                 worksheet_ost.write(cell, ins.inscription_date.strftime("%d/%m/%Y") if ins.inscription_date else '', cell_10_center)
                 cell = "B"+str(line)
