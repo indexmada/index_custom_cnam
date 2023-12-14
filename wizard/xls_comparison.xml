@@ -12,6 +12,9 @@
                 <group>
                     <field name="semester_ids" widget="many2many_tags"/>
                 </group>
+                <group>
+                    <field name="display_by"/>
+                </group>
                 <footer>
                     <button name="generate_report" type="object" string="Exporter" class="btn-primary"/>
                     <button string="Annuler" special="cancel"/>

@@ -16,12 +16,12 @@ UE_CENTER_NAME = ['MADAGASCAR', 'REUNION']
 class xlsComparisonController(http.Controller):
 
     @http.route('/web/binary/download_comparison_xls_file', type='http', auth="public")
-    def download_comparison_xls_file(self, school_year, semestres=''):  #
+    def download_comparison_xls_file(self, school_year, semestres='', display_by=''):  #
         filename = "Liste_comparative.xlsx"
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output)
 
-        self.report_excel_xls_comparison(workbook, school_year, semestres)  
+        self.report_excel_xls_comparison(workbook, school_year, semestres, display_by)  
         workbook.close()
         output.seek(0)
         xlsheader = [('Content-Type', 'application/octet-stream'),
@@ -29,7 +29,7 @@ class xlsComparisonController(http.Controller):
         return request.make_response(output, xlsheader)
 
 
-    def report_excel_xls_comparison(self, workbook, school_year,str_sem):
+    def report_excel_xls_comparison(self, workbook, school_year,str_sem, display):
         tab = ['monthly', 'weekly']
         bold_center_11 = workbook.add_format({
             'align': 'center',
@@ -82,11 +82,15 @@ class xlsComparisonController(http.Controller):
 
             worksheet_ost.merge_range('B1:G1','TABLEAU DE COMPARAISON - RECAP INSCRIPTION '+str(year),bold_center_11)
 
-            center_ids = request.env['region.center'].sudo().search([])
+            center_ids = request.env['region.center'].sudo().search([]) if display == 'exam' else request.env['examen.center'].sudo().search([])
             row = 4
             for center in center_ids:
-                insc_domain = [('region_center_id', '=', center.id), ('type', '=', 'registration')]
-                reinsc_domain = [('region_center_id', '=', center.id), ('type', '=', 're-registration')]
+                if display == 'exam':
+                    insc_domain = [('region_center_id', '=', center.id), ('type', '=', 'registration')]
+                    reinsc_domain = [('region_center_id', '=', center.id), ('type', '=', 're-registration')]
+                else:
+                    insc_domain = [('examen_center_id', '=', center.id), ('type', '=', 'registration')]
+                    reinsc_domain = [('examen_center_id', '=', center.id), ('type', '=', 're-registration')]
 
                 insc_ue_ids = request.env['inscription.edu'].sudo().search(insc_domain)
                 reinsc_ue_ids = request.env['inscription.edu'].sudo().search(reinsc_domain)

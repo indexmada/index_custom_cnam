@@ -8,6 +8,7 @@ class XlsComparison(models.Model):
 
     school_year = fields.Many2one(string="Années Universitaire", comodel_name="school.year")
     semester_ids = fields.Many2many(string="Semestres", comodel_name="semestre.edu")
+    display_by = fields.Selection(string="Afficher Par", selection=[('exam', "Centre d'examen"), ("organisatrice", "Centre organisatrice")])
 
     def generate_report(self):
         school_year = str(self.school_year.id)
@@ -21,6 +22,6 @@ class XlsComparison(models.Model):
             'type': 'ir.actions.act_url',
             'target': 'current',
             'url': '/web/binary/download_comparison_xls_file?school_year='
-                   + school_year+'&semestres='+str_semester
+                   + school_year+'&semestres='+str_semester+'&display_by='+ self.display_by
         }
         return actions
