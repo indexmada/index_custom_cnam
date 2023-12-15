@@ -89,8 +89,8 @@ class xlsComparisonController(http.Controller):
                     insc_domain = [('region_center_id', '=', center.id), ('type', '=', 'registration')]
                     reinsc_domain = [('region_center_id', '=', center.id), ('type', '=', 're-registration')]
                 else:
-                    insc_domain = [('examen_center_id', '=', center.id), ('type', '=', 'registration')]
-                    reinsc_domain = [('examen_center_id', '=', center.id), ('type', '=', 're-registration')]
+                    insc_domain = []
+                    reinsc_domain = []
 
                 insc_ue_ids = request.env['inscription.edu'].sudo().search(insc_domain)
                 reinsc_ue_ids = request.env['inscription.edu'].sudo().search(reinsc_domain)
@@ -106,6 +106,10 @@ class xlsComparisonController(http.Controller):
                         #     print(i,' ---- ', insc.get_semester_insc().ids)
                         insc_ue_ids_temp |= insc_ue_ids.filtered(lambda insc: int(i) in insc.get_semester_insc().ids)
                         reinsc_ue_ids_temp |= reinsc_ue_ids.filtered(lambda re: int(i) in re.get_semester_insc().ids)
+
+                    if display != 'exam':
+                        reinsc_ue_ids_temp = reinsc_ue_ids_temp.filtered(lambda x: center in (x.units_enseignes+x.other_ue_ids).mapped('center_id'))
+                        insc_ue_ids_temp = insc_ue_ids_temp.filtered(lambda x: center in (x.units_enseignes+x.other_ue_ids).mapped('center_id'))
 
                     insc_ue_ids = insc_ue_ids_temp
                     reinsc_ue_ids = reinsc_ue_ids_temp
@@ -153,14 +157,14 @@ class xlsComparisonController(http.Controller):
                     monthly = True if t == "monthly" else False
 
                     self.fillDateCell(worksheet_ost, row +1, cell_bold_center_11, monthly)
-                    self.fillUeData(worksheet_ost, row+2, cell_center_11,school_year_ids,reinsc_ue_ids, insc_ue_ids, monthly)
+                    self.fillUeData(worksheet_ost, row+2, cell_center_11,school_year_ids,reinsc_ue_ids, insc_ue_ids, monthly, center, display)
 
                     if t == "monthly":
                         row += 32
                     else:
                         row += 104
 
-    def fillUeData(self, worksheet_ost, row, row_style, year_ids, reinsc_ids, insc_ids, monthly):
+    def fillUeData(self, worksheet_ost, row, row_style, year_ids, reinsc_ids, insc_ids, monthly, center, display):
         counter = 0
         if monthly:
             col = ["B", "E", "H"]
@@ -192,6 +196,7 @@ class xlsComparisonController(http.Controller):
                     date_end = date(int(year_tab[0]), m, month_end)
                     reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end)
                     insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end)
+
                     cell = col[counter]+str(r)
                     cell_nvx = col_nvx[counter]+str(r)
                     worksheet_ost.write(cell, len(reinsc_filtered), row_style)
@@ -201,7 +206,15 @@ class xlsComparisonController(http.Controller):
                     worksheet_ost.merge_range(cell_tot, len(reinsc_filtered)+len(insc_filtered), row_style)
 
                     # UE Vendues
-                    nb_ue = len(reinsc_filtered.mapped('units_enseignes')) + len(reinsc_filtered.mapped('other_ue_ids')) + len(insc_filtered.mapped('units_enseignes')) + len(insc_filtered.mapped('other_ue_ids'))
+                    if display == "exam":
+                        nb_ue = len(reinsc_filtered.mapped('units_enseignes')) + len(reinsc_filtered.mapped('other_ue_ids')) + len(insc_filtered.mapped('units_enseignes')) + len(insc_filtered.mapped('other_ue_ids'))
+
+                    else:
+                        all_insc = reinsc_filtered +insc_filtered
+                        all_ue_ids = all_insc.mapped('units_enseignes') + all_insc.mapped('other_ue_ids')
+                        all_ue_filtered = all_ue_ids.filtered(lambda x: x.center_id == center)
+                        nb_ue = len(all_ue_filtered)
+
                     cell_ue = col_ue[counter]+str(r)+':'+col_ue[counter]+str(r+1)
                     worksheet_ost.merge_range(cell_ue, str(nb_ue), row_style)
 
