@@ -14,6 +14,7 @@
                 </group>
                 <group>
                     <field name="display_by"/>
+                    <field name="organisation_center_id" attrs="{'invisible': [('display_by', '!=', 'organisatrice')], 'required': [('display_by', '=', 'organisatrice')]}" widget="many2many_tags"/>
                 </group>
                 <footer>
                     <button name="generate_report" type="object" string="Exporter" class="btn-primary"/>

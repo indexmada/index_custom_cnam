@@ -16,12 +16,17 @@ UE_CENTER_NAME = ['MADAGASCAR', 'REUNION']
 class xlsComparisonController(http.Controller):
 
     @http.route('/web/binary/download_comparison_xls_file', type='http', auth="public")
-    def download_comparison_xls_file(self, school_year, semestres='', display_by=''):  #
+    def download_comparison_xls_file(self, school_year, semestres='', display_by='', center_id_str=""):  #
         filename = "Liste_comparative.xlsx"
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output)
 
-        self.report_excel_xls_comparison(workbook, school_year, semestres, display_by)  
+        center_ids = False
+        if center_id_str and display_by == "organisatrice":
+            center_tab = center_id_str.split("-")
+            center_ids = request.env["examen.center"].sudo().search([('id', 'in', [eval(i) for i in center_tab])])
+
+        self.report_excel_xls_comparison(workbook, school_year, semestres, display_by, center_ids)  
         workbook.close()
         output.seek(0)
         xlsheader = [('Content-Type', 'application/octet-stream'),
@@ -29,7 +34,7 @@ class xlsComparisonController(http.Controller):
         return request.make_response(output, xlsheader)
 
 
-    def report_excel_xls_comparison(self, workbook, school_year,str_sem, display):
+    def report_excel_xls_comparison(self, workbook, school_year,str_sem, display, req_center_ids):
         tab = ['monthly', 'weekly']
         bold_center_11 = workbook.add_format({
             'align': 'center',
@@ -82,7 +87,9 @@ class xlsComparisonController(http.Controller):
 
             worksheet_ost.merge_range('B1:G1','TABLEAU DE COMPARAISON - RECAP INSCRIPTION '+str(year),bold_center_11)
 
-            center_ids = request.env['region.center'].sudo().search([]) if display == 'exam' else request.env['examen.center'].sudo().search([])
+            center_domain = [("id", 'in', req_center_ids.ids)] if req_center_ids else []
+
+            center_ids = request.env['region.center'].sudo().search([]) if display == 'exam' else request.env['examen.center'].sudo().search(center_domain)
             row = 4
             for center in center_ids:
                 if display == 'exam':
