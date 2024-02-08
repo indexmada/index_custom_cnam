@@ -54,7 +54,7 @@
             <xpath expr="//field[@name='units_enseignes']/tree/field[@name='name']" position="replace">
                 <field name="name"
                     domain="[('id', 'in', parent.ue_permitted_ids), ('id', 'not in', parent.ue_selected_ids)]"
-                    string="Intitulé"/>
+                    string="Intitulé" options="{'no_create_edit': True}"/>
             </xpath>
         </field>
     </record>
