@@ -444,6 +444,7 @@ class NoteList(models.Model):
 
     def get_note_by_student(self, partner_id):
         notes = self.sudo().search([('partner_id', '=', partner_id), ('mention', '=', 'admis'), ('validation', '=', 'validated')])
+        notes = notes.filtered(lambda note: 'MADAGASCAR' in note.centre_ids.mapped('name'))
         return notes or False
 
     def get_all_note_by_student_by_year(self, partner_id, year_id):
