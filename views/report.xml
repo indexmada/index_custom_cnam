@@ -807,7 +807,7 @@
                             </t>
                         </t>
                             <div t-if="o.ue_config_id and o.ue_config_id.id not in ue_printed_id" class="page" style="font-family: 'arial';">
-                                <t t-set="ue_regrouping_lines" t-value="o._get_regrouping_line_by_ue(o.ue_config_id.id, o.school_year_id.id)"/>
+                                <t t-set="ue_regrouping_lines" t-value="o._get_regrouping_line_by_ue(o.ue_config_id.id, o.regrouping_id.school_year_id.id)"/>
                                 <t t-set="ue_printed_temp" t-value="ue_printed_id.append(o.ue_config_id.id)"/>
                                 <h2><span>CALENDRIER DE REGROUPEMENT <t t-esc="o.school_year_id.name"/></span></h2>
                                 <h3><t t-esc="o.ue_config_id.code"/> : <t t-esc="o.ue_config_id.name"/></h3>

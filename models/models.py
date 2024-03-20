@@ -77,7 +77,9 @@ class index_custom_cnam(models.Model):
             line.name = str(line.code_ue)+' '+str(line.school_year_id.name)
 
     def _get_regrouping_line_by_ue(self, ue_config_id,school_year_id):
-        regrouping_lines = self.sudo().search([('ue_config_id', '=', int(ue_config_id)), ('school_year_id', '=', school_year_id)], order="grouping_date ASC")
+        print('_'*100)
+        print(school_year_id)
+        regrouping_lines = self.sudo().search([('ue_config_id', '=', int(ue_config_id)), ('regrouping_id.school_year_id', '=', school_year_id)], order="grouping_date ASC")
         return regrouping_lines
 
     def _get_grouping_date_dayofweek(self):
