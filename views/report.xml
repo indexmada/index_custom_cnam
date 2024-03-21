@@ -615,6 +615,8 @@
                             </t>
                         </t>
                         <t t-set="notes" t-value="env['note.list'].sudo().get_note_by_student(o.sudo().partner_id.id)"/>
+                        <t t-set="au_ids" t-value="notes.mapped('years_id')"/>
+                        <t t-foreach="au_ids" t-as="au_id">
                             <div t-if="notes" class="page" style="font-family: 'arial';">
                                 <h2 class="text-center"><strong>ATTESTATION DE REUSSITE</strong></h2>
                                 <br/>
@@ -632,7 +634,7 @@
                                 </div>
                                 <br/>
                                 <t t-set="au" t-value="student.school_year.name"/>
-                                <div>A obtenu les Unités d'Enseignement suivantes durant l'année universitaire  : <span t-esc="au or ''" /></div><br/>
+                                <div>A obtenu les Unités d'Enseignement suivantes durant l'année universitaire  : <span t-esc="au_id.name or ''" /></div><br/>
                                 <table class="table table-bordered">
                                     <tr>
                                         <td style="border: 1px solid black;">N° UE</td>
@@ -647,7 +649,7 @@
                                         <td style="color: red;" t-else="" t-esc="'DEFAILLANT' if (o.mention == 'defaillant') else 'AJOURNE'"/> -->
 
                                         <t t-foreach="notes" t-as="note">
-                                            <tr>
+                                            <tr t-if="note.years_id == au_id">
                                                 <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.code"/></td>
                                                 <td style="border: 1px solid black;"><t t-esc="note.note_list_filter_id.unit_enseigne.name"/></td>
                                                 <td style="border: 1px solid black;"><t t-esc="note.note_sem2 or note.note_sem1"/></td>
@@ -679,6 +681,7 @@
                                 </div>
                             </div>
                             <p style="page-break-after:always"/>
+                        </t>
                     </t>  
                 </t>          
             </t>
