@@ -625,7 +625,7 @@
                                 </div>
                                 <h3 class="text-center"><strong><t t-esc="(o.student_name or '')+' '+(o.student_first_name or '')"/></strong></h3>
                                 <br/>
-                                <t t-set="student" t-value="o.env['inscription.edu'].sudo().search([('student_id', '=', o.partner_id.id)], limit=1)"/>
+                                <t t-set="student" t-value="o.env['inscription.edu'].sudo().search([('student_id', '=', o.partner_id.id), ('school_year', '=', au_id.id)], limit=1)"/>
                                 <div>
                                     <strong>Né(e) le: </strong><t t-esc="o.date_of_birth"/>
                                 </div>
