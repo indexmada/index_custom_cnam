@@ -203,6 +203,12 @@ class UnitEnseignementConfig(models.Model):
         for note in note_ids:
             note.write({"unit_enseigne": self.id})
 
+        # Update UE field in note_list_filter
+        note_list_filter_ids = self.env['note.list.filter'].sudo().search([('unit_enseigne', 'in', same_ue_ids.ids), ('unit_enseigne', '!=', self.id)])
+        for note_list in note_list_filter_ids:
+            note_list.write({"unit_enseigne": self.id})
+
+
         # Update UE field in regrouping
         reg_ids = self.env['regrouping.center.line'].sudo().search([('ue_config_id', 'in', same_ue_ids.ids), ('ue_config_id', '!=', self.id)])
         for reg in reg_ids:
