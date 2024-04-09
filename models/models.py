@@ -185,22 +185,33 @@ class UnitEnseignementConfig(models.Model):
         print('Merge Finished')
 
         # Update the field ue of the exam. 
-        exam_ids = self.env['exam.exam'].sudo().search([])
-        for exam in exam_ids:
-            if len(exam.ue_ids)>1 and self in exam.ue_ids:
-                for ue in exam.ue_ids:
-                    if ue != self and ue in same_ue_ids:
-                        exam.write({'ue_ids': [(3, ue.id)]})
+        for ue in same_ue_ids:
+            exam_ids = self.env['exam.exam'].sudo().search([]).filtered(lambda x: ue in x.ue_ids)
+
+            for exam in exam_ids:
+                if ue in exam.ue_ids and ue != self:
+                    exam.write({'ue_ids': [(3, ue.id)]})
+                    exam.write({"ue_ids": [(4, self.id)]})
 
         # Update the field ue of the Unité d'enseignement and Autre UE dans Inscription
         insc_ue_id = self.env['unit.enseigne'].sudo().search([('name.id', 'in', same_ue_ids.mapped("id")), ('name.id', '!=', self.id)])
         for ue_id in insc_ue_id:
             ue_id.write({'name': self.id})
 
+        # Update UE field in note
+        note_ids = self.env['note.list'].sudo().search([('unit_enseigne', 'in', same_ue_ids.ids), ('unit_enseigne', '!=', self.id)])
+        for note in note_ids:
+            note.write({"unit_enseigne": self.id})
+
+        # Update UE field in regrouping
+        reg_ids = self.env['regrouping.center.line'].sudo().search([('ue_config_id', 'in', same_ue_ids.ids), ('ue_config_id', '!=', self.id)])
+        for reg in reg_ids:
+            reg.write({"ue_config_id": self.id})
 
         for unit_enseigne in same_ue_ids:
             if unit_enseigne != self:
                 unit_enseigne.unlink()
+
 
 class InscriptionEducation(models.Model):
     _inherit="inscription.edu"
