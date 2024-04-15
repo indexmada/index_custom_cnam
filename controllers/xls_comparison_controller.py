@@ -89,15 +89,17 @@ class xlsComparisonController(http.Controller):
 
             center_domain = [("id", 'in', req_center_ids.ids)] if req_center_ids else []
 
-            center_ids = request.env['region.center'].sudo().search([]) if display == 'exam' else request.env['examen.center'].sudo().search(center_domain)
+            center_ids = request.env['region.center'].sudo().search(center_domain) if display == 'exam' else request.env['examen.center'].sudo().search(center_domain)
             row = 4
             for center in center_ids:
                 if display == 'exam':
                     insc_domain = [('region_center_id', '=', center.id), ('type', '=', 'registration')]
                     reinsc_domain = [('region_center_id', '=', center.id), ('type', '=', 're-registration')]
                 else:
-                    insc_domain = [('type', '=', 'registration')]
-                    reinsc_domain = [('type', '=', 're-registration')]
+                    # insc_domain = [('type', '=', 'registration')]
+                    # reinsc_domain = [('type', '=', 're-registration')]
+                    insc_domain = [('exam_center_id', '=', center.id), ('type', '=', 'registration')]
+                    reinsc_domain = [('exam_center_id', '=', center.id), ('type', '=', 're-registration')]
 
                 insc_ue_ids = request.env['inscription.edu'].sudo().search(insc_domain)
                 reinsc_ue_ids = request.env['inscription.edu'].sudo().search(reinsc_domain)
@@ -114,9 +116,9 @@ class xlsComparisonController(http.Controller):
                         insc_ue_ids_temp |= insc_ue_ids.filtered(lambda insc: int(i) in insc.get_semester_insc().ids)
                         reinsc_ue_ids_temp |= reinsc_ue_ids.filtered(lambda re: int(i) in re.get_semester_insc().ids)
 
-                    if display != 'exam':
-                        reinsc_ue_ids_temp = reinsc_ue_ids_temp.filtered(lambda x: center in (x.units_enseignes+x.other_ue_ids).mapped('center_id'))
-                        insc_ue_ids_temp = insc_ue_ids_temp.filtered(lambda x: center in (x.units_enseignes+x.other_ue_ids).mapped('center_id'))
+                    # if display != 'exam':
+                    #     reinsc_ue_ids_temp = reinsc_ue_ids_temp.filtered(lambda x: center in (x.units_enseignes+x.other_ue_ids).mapped('center_id'))
+                    #     insc_ue_ids_temp = insc_ue_ids_temp.filtered(lambda x: center in (x.units_enseignes+x.other_ue_ids).mapped('center_id'))
 
                     insc_ue_ids = insc_ue_ids_temp
                     reinsc_ue_ids = reinsc_ue_ids_temp
@@ -213,14 +215,16 @@ class xlsComparisonController(http.Controller):
                     worksheet_ost.merge_range(cell_tot, len(reinsc_filtered)+len(insc_filtered), row_style)
 
                     # UE Vendues
-                    if display == "exam":
-                        nb_ue = len(reinsc_filtered.mapped('units_enseignes')) + len(reinsc_filtered.mapped('other_ue_ids')) + len(insc_filtered.mapped('units_enseignes')) + len(insc_filtered.mapped('other_ue_ids'))
+                    # if display == "exam":
+                    #     nb_ue = len(reinsc_filtered.mapped('units_enseignes')) + len(reinsc_filtered.mapped('other_ue_ids')) + len(insc_filtered.mapped('units_enseignes')) + len(insc_filtered.mapped('other_ue_ids'))
 
-                    else:
-                        all_insc = reinsc_filtered +insc_filtered
-                        all_ue_ids = all_insc.mapped('units_enseignes') + all_insc.mapped('other_ue_ids')
-                        all_ue_filtered = all_ue_ids.filtered(lambda x: x.center_id == center)
-                        nb_ue = len(all_ue_filtered)
+                    # else:
+                    #     all_insc = reinsc_filtered +insc_filtered
+                    #     all_ue_ids = all_insc.mapped('units_enseignes') + all_insc.mapped('other_ue_ids')
+                    #     all_ue_filtered = all_ue_ids.filtered(lambda x: x.center_id == center)
+                    #     nb_ue = len(all_ue_filtered)
+
+                    nb_ue = len(reinsc_filtered.mapped('units_enseignes')) + len(reinsc_filtered.mapped('other_ue_ids')) + len(insc_filtered.mapped('units_enseignes')) + len(insc_filtered.mapped('other_ue_ids'))
 
                     cell_ue = col_ue[counter]+str(r)+':'+col_ue[counter]+str(r+1)
                     worksheet_ost.merge_range(cell_ue, str(nb_ue), row_style)
