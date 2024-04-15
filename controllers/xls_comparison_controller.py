@@ -98,8 +98,8 @@ class xlsComparisonController(http.Controller):
                 else:
                     # insc_domain = [('type', '=', 'registration')]
                     # reinsc_domain = [('type', '=', 're-registration')]
-                    insc_domain = [('exam_center_id', '=', center.id), ('type', '=', 'registration')]
-                    reinsc_domain = [('exam_center_id', '=', center.id), ('type', '=', 're-registration')]
+                    insc_domain = [('examen_center_id', '=', center.id), ('type', '=', 'registration')]
+                    reinsc_domain = [('examen_center_id', '=', center.id), ('type', '=', 're-registration')]
 
                 insc_ue_ids = request.env['inscription.edu'].sudo().search(insc_domain)
                 reinsc_ue_ids = request.env['inscription.edu'].sudo().search(reinsc_domain)
