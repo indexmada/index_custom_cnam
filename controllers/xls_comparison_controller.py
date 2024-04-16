@@ -203,8 +203,8 @@ class xlsComparisonController(http.Controller):
                 if monthly:
                     date_begin = date(int(year_tab[0]), m, 1)
                     date_end = date(int(year_tab[0]), m, month_end)
-                    reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and school_year == year_id)
-                    insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and school_year == year_id)
+                    reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and re.school_year == year_id)
+                    insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and insc.school_year == year_id)
 
                     cell = col[counter]+str(r)
                     cell_nvx = col_nvx[counter]+str(r)
@@ -239,8 +239,8 @@ class xlsComparisonController(http.Controller):
                     for day in day_tab:
                         date_begin = date(int(year_tab[0]), m, day[0])
                         date_end = date(int(year_tab[0]), m, day[1])
-                        reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and school_year == year_id)
-                        insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and school_year == year_id)
+                        reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and re.school_year == year_id)
+                        insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and insc.school_year == year_id)
                         cell = col[counter]+str(r)
                         cell_nvx = col_nvx[counter]+str(r)
                         worksheet_ost.write(cell, len(reinsc_filtered), row_style)
@@ -275,8 +275,8 @@ class xlsComparisonController(http.Controller):
                 if monthly: 
                     date_begin = date(int(year_tab[1]), m, 1)
                     date_end = date(int(year_tab[1]), m, month_end)
-                    reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and school_year == year_id)
-                    insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and school_year == year_id)
+                    reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and re.school_year == year_id)
+                    insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and insc.school_year == year_id)
                     cell = col[counter]+str(r)
                     cell_nvx = col_nvx[counter]+str(r)
                     worksheet_ost.write(cell, len(reinsc_filtered), row_style)
@@ -301,8 +301,8 @@ class xlsComparisonController(http.Controller):
                     for day in day_tab:
                         date_begin = date(int(year_tab[1]), m, day[0])
                         date_end = date(int(year_tab[1]), m, day[1])
-                        reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and school_year == year_id)
-                        insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and school_year == year_id)
+                        reinsc_filtered = reinsc_ids.filtered(lambda re: re.date >= date_begin and re.date <= date_end and re.school_year == year_id)
+                        insc_filtered = insc_ids.filtered(lambda insc: insc.date >= date_begin and insc.date <= date_end and insc.school_year == year_id)
                         cell = col[counter]+str(r)
                         cell_nvx = col_nvx[counter]+str(r)
                         worksheet_ost.write(cell, len(reinsc_filtered), row_style)
