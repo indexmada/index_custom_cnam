@@ -193,7 +193,7 @@ class xlsComparisonController(http.Controller):
             total_reinsc = 0
             total_insc = 0
             total_ue = 0
-            school_year_ids = request.env['school.year'].sudo().search([]).filtered(lambda x: x.name.find(year_tab[0]) >= 0 and x.name.find(year_tab[1]) >= 0)
+            school_year_ids = request.env['school.year'].sudo().search([]).filtered(lambda x: x.name.find(str(year_tab[0])) >= 0 and x.name.find(str(year_tab[1])) >= 0)
             
             if school_year_ids and len(school_year_ids):
                 school_year_id = school_year_ids[0]
