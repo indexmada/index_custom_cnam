@@ -43,4 +43,18 @@
             </field>
         </field>
     </record>
+
+    <record id="edu_view_exam_exam_form_inherit" model="ir.ui.view">
+        <field name="name">exam.exam.form.inherit</field>
+        <field name="model">exam.exam</field>
+        <field name="inherit_id" ref="edu_management.view_exam_exam_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="calculate" string="Calculer / Recalculer" type="object"
+                                            class="oe_highlight"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
 </odoo>

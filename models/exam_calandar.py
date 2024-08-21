@@ -37,6 +37,10 @@ class ExamExam(models.Model):
                         region_centers |= repartition_id.center_ids
             record.center_ids_computed = region_centers
 
+     def calculate(self):
+        calendar_id = self.exam_calandar_id
+        calendar_id.recalculate(self)
+
 class ConvocationList(models.Model):
     _inherit="convocation.list"
 
@@ -98,18 +102,32 @@ class index_custom_cnam(models.Model):
 
 
                     
-    def recalculate(self):
-        if self.session.name.find('2')  > 0 :
-            for exam in self.exam_ids:
+    def recalculate(self, specific_exam = None):
+        # if self.session.name.find('2')  > 0 :
+        if True:
+            self_exam_ids = specific_exam or self.exam_ids
+            for exam in self_exam_ids:
+                print('________________________')
+                print(exam.id)
                 repartition_ids = exam.exam_repartition_ids
                 for rep in repartition_ids:
                     rep.unlink()
 
-                convocation_ids = exam.convocation_ids
-                for conv in convocation_ids:
-                    conv.unlink()
+                if specific_exam:
+                    convocation_ids = exam.convocation_ids
+                    code_ue = exam.ue_ids[0].code
+                    # Filtrer les lignes à supprimer
+                    line_filtered_ids = convocation_ids.mapped("line_ids").filtered(lambda l: (l.code).rstrip() == code_ue and l.start_time == exam.start_time and l.end_time == exam.end_time)
+                    print('______')
+                    print(line_filtered_ids)
+                    line_filtered_ids.unlink()
 
-        self.calculate()
+                else:
+                    convocation_ids = exam.convocation_ids
+                    for conv in convocation_ids:
+                        conv.unlink()
+
+        self.calculate(specific_exam)
 
     def get_default_start_and_end_time_for_date(self, date, after):
         date_dayofweek = date.weekday() #Return int 0:lundi, 1:mardi,...
@@ -165,7 +183,7 @@ class index_custom_cnam(models.Model):
         filtered_note = note_list_ids.filtered(lambda note: note.mention != 'admis' or note.validation == 'waiting')
         return filtered_note.mapped('partner_id')
 
-    def calculate(self):
+    def calculate(self, specific_exam = None):
         unit_enseignes_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account')), ('school_year', '=', self.school_year.id)]).mapped('units_enseignes')
         other_ues_obj = self.env['inscription.edu'].search([('state','in',('enf','accueil','account')), ('school_year', '=', self.school_year.id)]).mapped('other_ue_ids')
         unit_enseignes_obj |= other_ues_obj
@@ -181,7 +199,8 @@ class index_custom_cnam(models.Model):
             int_cn = 1
             prefix = '000'
 
-        for exam in self.exam_ids:
+        self_exam_ids = specific_exam or self.exam_ids
+        for exam in self_exam_ids:
             temp_insc_ids = unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id and ((self.semester == u.semestre_id) or (self.semester_annuel and self.semester_annuel == u.semestre_id))).mapped('inscription_id')
             temp_insc_ids |= unit_enseignes_obj.filtered(lambda u: u.name in exam.ue_ids and exam.centre_ue_id.id == u.center_id.id and ((self.semester == u.semestre_id) or (self.semester_annuel and self.semester_annuel == u.semestre_id))).mapped('inscription_other_id')
             if not (exam.date and exam.start_time != 0 and exam.end_time != 0):
