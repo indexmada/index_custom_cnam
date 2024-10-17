@@ -45,7 +45,7 @@
                 <search string="Search Prestation">
                      <group expand="0" string="Group By" colspan="4">
                          <filter name="ue_config_id" string="UE" context="{'group_by':'ue_config_id'}"/>
-			 <filter name="year_id" string="Année Universitaire" context="{'group_by':'year_id'}"/>
+                         <filter name="school_year" string="Année Scolaire" context="{'group_by':'school_year'}"/>
                     </group>
 
                 </search>
