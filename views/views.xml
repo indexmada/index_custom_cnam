@@ -1,0 +1,62 @@
+<odoo>
+  <data>
+    <record id="unit_enseigne_config_form_inherit" model="ir.ui.view">
+        <field name="name">unit.enseigne.config.form.inherit</field>
+        <field name="model">unit.enseigne.config</field>
+        <field name="inherit_id" ref="edu_management.unit_enseigne_config_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="merge_ue" string="Fusionner UE" type="object" class="btn-primary" help="Fusionner ici les autres UE portant le même intitulé et même code."/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='formation_id']" position="replace">
+                <field name="formation_id" string="Save Formation"/>
+                <field name="formation_ids" widget="many2many_tags"/>
+                <field name="same_exam_room"/>
+                <p attrs="{'invisible': [('same_exam_room', '=', False)]}">Note: Il est conseillé de mettre les examens contenant cette unités d'enseignements en haut de la liste des examens dans le calendrier (Créer l'examen contenant cette UE avant les autres).</p>
+            </xpath>
+            <xpath expr="//field[@name='year']" position="replace">
+                <field name="year" string="Save Année"/>
+                <field name="years" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Default Record for Year -->
+    <record id="default_record_year_1" model="year.year">
+        <field name="name">1</field>
+    </record>
+    <record id="default_record_year_2" model="year.year">
+        <field name="name">2</field>
+    </record>
+    <record id="default_record_year_3" model="year.year">
+        <field name="name">3</field>
+    </record>
+    <record id="default_record_year_4" model="year.year">
+        <field name="name">4</field>
+    </record>
+    <record id="default_record_year_5" model="year.year">
+        <field name="name">5</field>
+    </record>
+    <record id="default_record_year_6" model="year.year">
+        <field name="name">6</field>
+    </record>
+    <record id="default_record_year_7" model="year.year">
+        <field name="name">7</field>
+    </record>
+
+    <record id="inscription_edu_form_inherit" model="ir.ui.view">
+        <field name="name">inscription_edu.inherit</field>
+        <field name="model">inscription.edu</field>
+        <field name="inherit_id" ref="edu_management.inscription_edu_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='units_enseignes']/tree/field[@name='name']" position="replace">
+                <field name="name"
+                    domain="[('id', 'in', parent.ue_permitted_ids), ('id', 'not in', parent.ue_selected_ids)]"
+                    string="Intitulé" options="{'no_create_edit': True}"/>
+            </xpath>
+        </field>
+    </record>
+  </data>
+</odoo>

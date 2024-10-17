@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="regrouping_edu_form" model="ir.ui.view">
+		<field name="name">regrouping.center.form</field>
+        <field name="model">regrouping.center</field>
+        <field name="inherit_id" ref="edu_management.regrouping_edu_form"/>
+        <field name="arch" type="xml">
+        	<xpath expr="//field[@name='begin_hours']" position="replace">
+        		<field name="begin_hours" widget="float_time"/>
+        	</xpath>
+        	<xpath expr="//field[@name='end_hours']" position="replace">
+        		<field name="end_hours" widget="float_time"/>
+        	</xpath>
+        	<xpath expr="//field[@name='duration']" position="replace">
+        		<field name="duration" widget="float_time"/>
+        	</xpath>
+            <xpath expr="//field[@name='regrouping_line_ids']/tree/field[@name='assignement_ids']" position="after">
+                <field name="student_pointed_ids" widget="many2many_tags"/>
+                <field name="grouping_date" invisible="1"/>
+            </xpath>
+        </field>
+	</record>
+
+
+     <record model="ir.ui.view" id="grouping_view_calendar">
+            <field name="model">regrouping.center</field>
+            <field name="priority" eval="2"/>
+            <field name="inherit_id" ref="edu_management.grouping_view_calendar"/>
+            <field name="arch" type="xml">
+                <xpath expr="//calendar" position="replace">
+                    <calendar string="Regroupement" date_start="reg_date_begin" date_stop="reg_date_end" mode="month" quick_add="False"  event_open_popup="True" color="school_year_id">
+                        <field name="date"/>
+                        <field name="school_year_id"/>
+                    </calendar>
+                </xpath>
+            </field>
+    </record>
+
+<!-- Calendrier par UE -->
+
+    <record id="view_regrouping_edu_filter" model="ir.ui.view">
+            <field name="name">regrouping.center.line.search</field>
+            <field name="model">regrouping.center.line</field>
+            <field name="arch" type="xml">
+                <search string="Search Prestation">
+                     <group expand="0" string="Group By" colspan="4">
+                         <filter name="ue_config_id" string="UE" context="{'group_by':'ue_config_id'}"/>
+			 <filter name="year_id" string="Année Universitaire" context="{'group_by':'year_id'}"/>
+                    </group>
+
+                </search>
+            </field>
+    </record>
+
+     <record id="regrouping_edu_by_ue_form" model="ir.ui.view">
+        <field name="name">regrouping.center.line.tree</field>
+        <field name="model">regrouping.center.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="ue_config_id"/>
+                <field name="grouping_date"/>
+                <field name="begin_hours" widget="float_time"/>
+                <field name="end_hours" widget="float_time"/>
+                <field name="examen_rooms" widget="many2many_tags"/>
+                <field name="assignement_ids" widget="many2many_tags"/>
+                <field name="regrouping_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="grouping_edu_by_ue_action" model="ir.actions.act_window">
+        <field name="name">Calendrier par UE</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">regrouping.center.line</field>
+        <field name="view_mode">tree,search,form,kanban</field>
+        <field name="context">{'search_default_ue_config_id': 1}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+           Créer une nouvelle calendrier de regroupement
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="grouping_center_by_ue_menu"
+              name="Calendrier Par UE"
+              action="grouping_edu_by_ue_action"
+              parent="edu_management.menu_grouping" sequence="2" />
+
+</odoo>
