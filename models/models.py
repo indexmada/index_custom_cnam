@@ -25,7 +25,7 @@ class index_custom_cnam(models.Model):
 
     begin_date_time = fields.Datetime("Date et Heure de début", compute='_compute_begin_date_time')
     end_date_time = fields.Datetime("Date et Heure de fin", compute='_compute_end_date_time')
-    school_year_id = fields.Many2one("school.year", "Année Universitaire", required=True,compute='compute_school_year')
+    school_year_id = fields.Many2one("school.year", "Année Universitaire", required=True, compute='compute_school_year', store=True)
     grouping_date = fields.Date("Date du regroupement", store=True, default=_set_default_grouping_date)
 
     student_pointed_ids = fields.Many2many("assignment.student", "regrouping_line_id", string="Pointage", domain="[('id', 'in', assignement_ids)]")
