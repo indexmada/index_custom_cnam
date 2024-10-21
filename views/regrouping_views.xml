@@ -45,7 +45,7 @@
                 <search string="Search Prestation">
                      <group expand="0" string="Group By" colspan="4">
                          <filter name="ue_config_id" string="UE" context="{'group_by':'ue_config_id'}"/>
-                         <filter name="school_year" string="Année Scolaire" context="{'group_by':'school_year'}"/>
+                         <filter name="school_year_id" string="Année Scolaire" context="{'group_by':'school_year_id'}"/>
                     </group>
 
                 </search>
@@ -63,6 +63,7 @@
                 <field name="end_hours" widget="float_time"/>
                 <field name="examen_rooms" widget="many2many_tags"/>
                 <field name="assignement_ids" widget="many2many_tags"/>
+		<field name="school_year_id"/>
                 <field name="regrouping_id" invisible="1"/>
             </tree>
         </field>
